@@ -1,0 +1,10 @@
+"./syscfg/board.obj"
+"./syscfg/c2000ware_libraries.obj"
+"./i2cLib_polling.obj"
+"./i2c_gd_setup.obj"
+"./device/device.obj"
+"./device/f28002x_codestartbranch.obj"
+"../28002x_generic_flash_lnk.cmd"
+"C:/ti/c2000/C2000Ware_5_00_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib"
+-lc2000ware_libraries.cmd.genlibs
+-llibc.a
