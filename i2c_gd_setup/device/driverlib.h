@@ -43,7 +43,7 @@
 #ifndef DRIVERLIB_H
 #define DRIVERLIB_H
 
-#include "inc/hw_memmap.h"
+#include "driverlib/inc/hw_memmap.h"
 
 #include "adc.h"
 #include "asysctl.h"

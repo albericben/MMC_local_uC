@@ -7,7 +7,7 @@
 //
 //#############################################################################
 
-#include "driverlib.h"
+#include "device/driverlib.h"
 #include "device.h"
 #include "i2cLib_polling.h"
 
@@ -124,3 +124,159 @@ uint16_t checkBusStatus(uint32_t base)
 
     return SUCCESS;
 }
+
+// Original Version
+//void I2C_GD_Setup(uint8_t devicesConfig)
+//{
+//    I2CB.base               = I2CB_BASE;
+//    uint8_t i;
+//
+//    for (i = 0; i < devicesConfig; i++)
+//    {
+//        SysCtl_delay(1000); //Adding delay to correctly register commands in Gate Driver
+//
+//        I2CB.TargetAddr         = I2CB_ADDRESS;
+//        I2CB.NumOfAddrBytes     = 4;
+//
+//        if (i == 0)
+//        {
+//            I2CB.pTX_MsgBuffer      = &add1Data[0];
+//
+//            GPIO_writePin(ENA_PIN, 1);         // Enable 1 Pin ON
+//            GPIO_writePin(ENB_PIN, 0);         // Enable 2 Pin OFF
+//            GPIO_writePin(SIGA_PIN, 1);         // Signal 1 Pin ON
+//            GPIO_writePin(RDY_PIN, 0);
+//
+//            SysCtl_delay(1000); //Adding delay to correctly register commands in Gate Driver
+//
+//            status = I2C_ControllerTransmitter(&I2CB);
+//
+//            // Wait for I2CB to be complete transmission of data
+//            while(I2C_getStatus(I2CB.base) & I2C_STS_BUS_BUSY);
+//            SysCtl_delay(100); //Adding delay to correctly register commands in Gate Driver
+//
+//            I2CB.TargetAddr         = I2CB_ADDRESS_D1;
+//        }
+//        else if (i == 1)
+//        {
+//            I2CB.pTX_MsgBuffer      = &add2Data[0];
+//
+//            GPIO_writePin(ENA_PIN, 1);         // Enable 1 Pin ON
+//            GPIO_writePin(ENB_PIN, 0);         // Enable 2 Pin OFF
+//            GPIO_writePin(SIGA_PIN, 0);         // Signal 1 Pin OFF
+//            GPIO_writePin(RDY_PIN, 0);
+//
+//            SysCtl_delay(1000); //Adding delay to correctly register commands in Gate Driver
+//
+//            status = I2C_ControllerTransmitter(&I2CB);
+//
+//            // Wait for I2CB to be complete transmission of data
+//            while(I2C_getStatus(I2CB.base) & I2C_STS_BUS_BUSY);
+//            SysCtl_delay(100); //Adding delay to correctly register commands in Gate Driver
+//
+//            I2CB.TargetAddr         = I2CB_ADDRESS_D2;
+//        }
+//        else if (i == 2)
+//        {
+//            I2CB.pTX_MsgBuffer      = &add3Data[0];
+//
+//            GPIO_writePin(ENA_PIN, 0);         // Enable 1 Pin OFF
+//            GPIO_writePin(ENB_PIN, 1);         // Enable 2 Pin ON
+//            GPIO_writePin(SIGB_PIN, 1);         // Signal 2 Pin ON
+//            GPIO_writePin(RDY_PIN, 0);
+//
+//            SysCtl_delay(1000); //Adding delay to correctly register commands in Gate Driver
+//
+//            status = I2C_ControllerTransmitter(&I2CB);
+//
+//            // Wait for I2CB to be complete transmission of data
+//            while(I2C_getStatus(I2CB.base) & I2C_STS_BUS_BUSY);
+//            SysCtl_delay(100); //Adding delay to correctly register commands in Gate Driver
+//
+//            I2CB.TargetAddr         = I2CB_ADDRESS_D3;
+//        }
+//        else
+//        {
+//            I2CB.pTX_MsgBuffer      = &add4Data[0];
+//
+//            GPIO_writePin(ENA_PIN, 0);         // Enable 1 Pin OFF
+//            GPIO_writePin(ENB_PIN, 1);         // Enable 2 Pin ON
+//            GPIO_writePin(SIGB_PIN, 0);         // Signal 2 Pin OFF
+//            GPIO_writePin(RDY_PIN, 0);
+//
+//            SysCtl_delay(1000); //Adding delay to correctly register commands in Gate Driver
+//
+//            status = I2C_ControllerTransmitter(&I2CB);
+//
+//            // Wait for I2CB to be complete transmission of data
+//            while(I2C_getStatus(I2CB.base) & I2C_STS_BUS_BUSY);
+//            SysCtl_delay(100); //Adding delay to correctly register commands in Gate Driver
+//
+//            I2CB.TargetAddr         = I2CB_ADDRESS_D4;
+//        }
+//
+//        GPIO_writePin(ENA_PIN, 0);
+//        GPIO_writePin(ENB_PIN, 0);
+//        GPIO_writePin(RDY_PIN, 0);          // low impedance
+//
+////        SysCtl_delay(1000); //Adding delay to correctly register commands in Gate Driver
+//
+//        I2CB.NumOfAddrBytes     = 6;
+//        I2CB.pTX_MsgBuffer      = &gateData[0];
+//
+////        SysCtl_delay(1000); //Adding delay to correctly register commands in Gate Driver
+//
+//        status = I2C_ControllerTransmitter(&I2CB);
+//
+//        // Wait for I2CB to be complete transmission of data
+//        while(I2C_getStatus(I2CB.base) & I2C_STS_BUS_BUSY);
+//        SysCtl_delay(100); //Adding delay to correctly register commands in Gate Driver
+//
+//        I2CB.NumOfAddrBytes     = 3;
+//        I2CB.pTX_MsgBuffer      = &safetestData[0];
+//
+//        SysCtl_delay(1000); //Adding delay to correctly register commands in Gate Driver
+//
+//        status = I2C_ControllerTransmitter(&I2CB);
+//
+//        // Wait for I2CB to be complete transmission of data
+//        while(I2C_getStatus(I2CB.base) & I2C_STS_BUS_BUSY);
+//        SysCtl_delay(100); //Adding delay to correctly register commands in Gate Driver
+//
+//        I2CB.NumOfAddrBytes     = 2;
+//        I2CB.pTX_MsgBuffer      = &desatimeData[0];
+//
+//        SysCtl_delay(1000); //Adding delay to correctly register commands in Gate Driver
+//
+//        status = I2C_ControllerTransmitter(&I2CB);
+//
+//        // Wait for I2CB to be complete transmission of data
+//        while(I2C_getStatus(I2CB.base) & I2C_STS_BUS_BUSY);
+//        SysCtl_delay(100); //Adding delay to correctly register commands in Gate Driver
+//
+//
+//        I2CB.NumOfAddrBytes     = 4;
+//        I2CB.pTX_MsgBuffer      = &setOKData[0];
+//
+//        SysCtl_delay(1000); //Adding delay to correctly register commands in Gate Driver
+//
+//        status = I2C_ControllerTransmitter(&I2CB);
+//
+//        // Wait for I2CB to be complete transmission of data
+//        while(I2C_getStatus(I2CB.base) & I2C_STS_BUS_BUSY);
+//        SysCtl_delay(100); //Adding delay to correctly register commands in Gate Driver
+//    }
+//
+////    GPIO_writePin(RDY_PIN, 1);          // high impedance
+////
+////    SysCtl_delay(10000); //Adding delay to correctly register commands in Gate Driver
+////
+////    GPIO_writePin(RDY_PIN, 0);          // low impedance
+//
+////    SysCtl_delay(10000); //Adding delay to correctly register commands in Gate Driver
+//
+//    GPIO_writePin(ENA_PIN, 1);
+//    GPIO_writePin(ENB_PIN, 1);
+//    GPIO_writePin(RDY_PIN, 1);          // high impedance
+//
+//}
