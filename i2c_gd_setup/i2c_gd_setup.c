@@ -180,7 +180,7 @@ void I2C_GD_Setup(uint8_t devicesConfig)
     I2CB.base               = I2CB_BASE;
     uint8_t i;
 
-    for (i = 0; i < devicesConfig; i++)
+    for (i = 1; i < devicesConfig; i++)
     {
         SysCtl_delay(1000); //Adding delay to correctly register commands in Gate Driver
 
