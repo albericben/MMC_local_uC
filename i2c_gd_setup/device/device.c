@@ -174,13 +174,13 @@ void Device_enableAllPeripherals(void)
 //    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_SPIA);
 //    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_SPIB);
 
-    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_I2CA);
-    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_I2CB);
+//    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_I2CA);
+//    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_I2CB);
 
-    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_CANA);
+//    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_CANA);
 
-    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_ADCA);
-    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_ADCC);
+//    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_ADCA);
+//    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_ADCC);
 
 //    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_CMPSS1);
 //    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_CMPSS2);
