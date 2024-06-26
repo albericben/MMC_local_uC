@@ -5,7 +5,23 @@
 // TITLE:  Gate driver signal testing for PCB with open-loop control
 //
 //!
-//! This program runs PWM controller to communicate with 1ED3461MU12M gate driver
+//! This program runs I2CB module as controller to communicate with 1ED3830MU12M gate driver
+//! configuration This program uses polling (not FIFO interrupts)
+//!
+//! \b External \b Connections on launchpad should be made as shown below \n
+//!  --------------------------------
+//!    Signal   |  I2CA   |  I2CB
+//!  --------------------------------
+//!     SCL     | DEVICE_GPIO_PIN_SCLA   |  DEVICE_GPIO_PIN_SCLB
+//!     SDA     | DEVICE_GPIO_PIN_SDAA   |  DEVICE_GPIO_PIN_SDAB
+//!  --------------------------------
+//!
+//! \b Watch \b Variables in memory window\n
+//!  - \b I2CA_TXdata
+//!  - \b I2CA_RXdata
+//!  - \b I2CB_TXdata
+//!  - \b I2CB_RXdata
+//!    stream for error checking
 //!
 //#############################################################################
 //
