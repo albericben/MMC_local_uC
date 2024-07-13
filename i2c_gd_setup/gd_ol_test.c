@@ -5,23 +5,8 @@
 // TITLE:  Gate driver signal testing for PCB with open-loop control
 //
 //!
-//! This program runs I2CB module as controller to communicate with 1ED3830MU12M gate driver
+//! This program runs controller to communicate with 1ED3461MU12M gate driver
 //! configuration This program uses polling (not FIFO interrupts)
-//!
-//! \b External \b Connections on launchpad should be made as shown below \n
-//!  --------------------------------
-//!    Signal   |  I2CA   |  I2CB
-//!  --------------------------------
-//!     SCL     | DEVICE_GPIO_PIN_SCLA   |  DEVICE_GPIO_PIN_SCLB
-//!     SDA     | DEVICE_GPIO_PIN_SDAA   |  DEVICE_GPIO_PIN_SDAB
-//!  --------------------------------
-//!
-//! \b Watch \b Variables in memory window\n
-//!  - \b I2CA_TXdata
-//!  - \b I2CA_RXdata
-//!  - \b I2CB_TXdata
-//!  - \b I2CB_RXdata
-//!    stream for error checking
 //!
 //#############################################################################
 //
@@ -56,13 +41,6 @@ void main(void)
 
     SysCtl_delay(1000000); //Adding delay to correctly register commands in Gate Driver
 
-    //
-    // Initialize device clock and peripherals
-    //
-    Device_init();
-
-    SysCtl_delay(1000); //Adding delay to correctly register commands in Gate Driver
-
     GPIO_setPadConfig(SIGA_PIN, GPIO_PIN_TYPE_STD);    // Enable standard output on Signal A Pin (7)
     GPIO_setPinConfig(GPIO_7_GPIO7);
     GPIO_setDirectionMode(SIGA_PIN, GPIO_DIR_MODE_OUT);
@@ -70,6 +48,14 @@ void main(void)
     GPIO_setPadConfig(SIGB_PIN, GPIO_PIN_TYPE_STD);    // Enable standard output on Signal B Pin (5)
     GPIO_setPinConfig(GPIO_5_GPIO5);
     GPIO_setDirectionMode(SIGB_PIN, GPIO_DIR_MODE_OUT);
+
+    GPIO_writePin(SIGA_PIN, 1);         // Signal 1 Pin ON
+    GPIO_writePin(SIGB_PIN, 1);         // Signal 2 Pin OFF
+
+    //
+    // Initialize device clock and peripherals
+    //
+    Device_init();
 
     GPIO_setPadConfig(ENA_PIN, GPIO_PIN_TYPE_STD);    // Enable enable A pin as output (32)
     GPIO_setPinConfig(GPIO_32_GPIO32);
@@ -87,19 +73,17 @@ void main(void)
     GPIO_setPinConfig(GPIO_4_GPIO4);
     GPIO_setDirectionMode(FLTN_PIN, GPIO_DIR_MODE_IN);
 
-    GPIO_writePin(SIGA_PIN, 1);         // Signal 1 Pin ON
-    GPIO_writePin(SIGB_PIN, 1);         // Signal 2 Pin OFF
-    GPIO_writePin(RDY_PIN, 1);         // Signal 2 Pin OFF
+    GPIO_writePin(SIGA_PIN, 0);         // Signal 1 Pin ON
+    GPIO_writePin(SIGB_PIN, 0);         // Signal 2 Pin OFF
+    GPIO_writePin(RDY_PIN, 0);         // Ready Pin
 
-    SysCtl_delay(1000000); //Adding delay to correctly register commands in Gate Driver
+    SysCtl_delay(10000000); //Adding delay to correctly register commands in Gate Driver
 
-    // GD_TST();    // Setup up to 4 Gate drivers
     GPIO_writePin(ENA_PIN, 0);         // Enable 1 Pin OFF
     GPIO_writePin(ENB_PIN, 0);         // Enable 2 Pin OFF
-    GPIO_writePin(SIGA_PIN, 1);         // Signal 1 Pin ON
-    GPIO_writePin(SIGB_PIN, 0);         // Signal 2 Pin OFF
+    GPIO_writePin(RDY_PIN, 1);         // Signal 2 Pin OFF
 
-    SysCtl_delay(1000000); //Adding delay to correctly register commands in Gate Driver
+    SysCtl_delay(10000000); //Adding delay to correctly register commands in Gate Driver
 
     while(1)
         {
@@ -119,7 +103,7 @@ void main(void)
                     flt_val = 0;
                     break;
                 }
-                else if (count == 100000)
+                else if (count == 1000000)
                 {
                     GPIO_togglePin(SIGA_PIN);   // Signal 1 Pin toggle
                     GPIO_togglePin(SIGB_PIN);   // Signal 2 Pin toggle
