@@ -142,7 +142,7 @@ all: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 inverter_basic.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: C2000 Linker'
-	"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --idiv_support=idiv0 --tmu_support=tmu0 -Ooff --define=DEBUG --define=_FLASH --diag_suppress=10063 --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"inverter_basic.map" --heap_size=0x100 --stack_size=0x200 --warn_sections -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib" -i"C:/ti/c2000/C2000Ware_5_01_00_00" -i"C:/Users/alber/workspace_v12/inverter_basic/CPU1_FLASH/syscfg" -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include" --reread_libs --define=_FLASH --diag_wrap=off --display_error_number --xml_link_info="inverter_basic_linkInfo.xml" --entry_point=code_start --rom_model -o "inverter_basic.out" $(ORDERED_OBJS)
+	"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --idiv_support=idiv0 --tmu_support=tmu0 -Ooff --define=DEBUG --define=_FLASH --diag_suppress=10063 --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"inverter_basic.map" --heap_size=0x100 --stack_size=0x200 --warn_sections -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib" -i"C:/ti/c2000/C2000Ware_5_01_00_00" -i"C:/Users/alber/Documents/MMC_local_uC/inverter_basic/CPU1_FLASH/syscfg" -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include" --reread_libs --define=_FLASH --diag_wrap=off --display_error_number --xml_link_info="inverter_basic_linkInfo.xml" --entry_point=code_start --rom_model -o "inverter_basic.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 	@$(MAKE) --no-print-directory post-build
@@ -159,9 +159,9 @@ clean:
 
 post-build:
 	-echo "========= Build of the CLB simulation has moved to the CLB Tool. Click the '?' icon by the _Generate CLB Simulation File_ enable for more details (located in the Global Parameters of the Tile Design SysConfig module) ============="
-	-if 0 == 1  C:/ti/ccs1260/ccs/tools/node/node.exe "C:/ti/c2000/C2000Ware_5_01_00_00/utilities/clb_tool/clb_syscfg/dot_file_libraries/clbDotUtility.js"  "C:/ti/c2000/C2000Ware_5_01_00_00/utilities/clb_tool/clb_syscfg/" "C:/Users/alber/workspace_v12/inverter_basic/CPU1_FLASH/syscfg" "C:/Users/alber/workspace_v12/inverter_basic/CPU1_FLASH/syscfg/clb.dot"
-	-if 0 == 1  mkdir "C:/Users/alber/workspace_v12/inverter_basic/CPU1_FLASH/diagrams"
-	-if 0 == 1  C:/ti/ccs1260/ccs/tools/node/node.exe "C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/.meta/generate_diagrams.js" "C:/ti/c2000/C2000Ware_5_01_00_00" "C:/Users/alber/workspace_v12/inverter_basic/CPU1_FLASH/diagrams" "C:/Users/alber/workspace_v12/inverter_basic/CPU1_FLASH/syscfg"
+	-if 0 == 1  C:/ti/ccs1260/ccs/tools/node/node.exe "C:/ti/c2000/C2000Ware_5_01_00_00/utilities/clb_tool/clb_syscfg/dot_file_libraries/clbDotUtility.js"  "C:/ti/c2000/C2000Ware_5_01_00_00/utilities/clb_tool/clb_syscfg/" "C:/Users/alber/Documents/MMC_local_uC/inverter_basic/CPU1_FLASH/syscfg" "C:/Users/alber/Documents/MMC_local_uC/inverter_basic/CPU1_FLASH/syscfg/clb.dot"
+	-if 0 == 1  mkdir "C:/Users/alber/Documents/MMC_local_uC/inverter_basic/CPU1_FLASH/diagrams"
+	-if 0 == 1  C:/ti/ccs1260/ccs/tools/node/node.exe "C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/.meta/generate_diagrams.js" "C:/ti/c2000/C2000Ware_5_01_00_00" "C:/Users/alber/Documents/MMC_local_uC/inverter_basic/CPU1_FLASH/diagrams" "C:/Users/alber/Documents/MMC_local_uC/inverter_basic/CPU1_FLASH/syscfg"
 	-@echo ' '
 
 .PHONY: all clean dependents

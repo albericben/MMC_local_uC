@@ -13,9 +13,12 @@ ORDERED_OBJS += \
 "./inverter_basic.obj" \
 "./syscfg/board.obj" \
 "./syscfg/c2000ware_libraries.obj" \
+"./inverter_uC_MMC.obj" \
 "./device/device.obj" \
 "./device/f28002x_codestartbranch.obj" \
 "../280023_RAM_lnk.cmd" \
+"../28002x_generic_flash_lnk.cmd" \
+"../28002x_generic_ram_lnk.cmd" \
 "C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib" \
 $(GEN_CMDS__FLAG) \
 -lc2000ware_libraries.cmd.genlibs \
@@ -142,7 +145,7 @@ all: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 inverter_uC_MMC.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: C2000 Linker'
-	"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --idiv_support=idiv0 --tmu_support=tmu0 -Ooff --define=DEBUG --define=RAM --diag_suppress=10063 --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"inverter_uC_MMC.map" --heap_size=0x100 --stack_size=0x200 --warn_sections -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib" -i"C:/ti/c2000/C2000Ware_5_01_00_00" -i"C:/Users/alber/workspace_v12/inverter_uC_MMC/CPU1_RAM/syscfg" -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include" --reread_libs --diag_wrap=off --display_error_number --xml_link_info="inverter_uC_MMC_linkInfo.xml" --entry_point=code_start --rom_model -o "inverter_uC_MMC.out" $(ORDERED_OBJS)
+	"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --idiv_support=idiv0 --tmu_support=tmu0 -Ooff --define=DEBUG --define=RAM --diag_suppress=10063 --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"inverter_uC_MMC.map" --heap_size=0x100 --stack_size=0x200 --warn_sections -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib" -i"C:/ti/c2000/C2000Ware_5_01_00_00" -i"C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/CPU1_RAM/syscfg" -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include" --reread_libs --diag_wrap=off --display_error_number --xml_link_info="inverter_uC_MMC_linkInfo.xml" --entry_point=code_start --rom_model -o "inverter_uC_MMC.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 	@$(MAKE) --no-print-directory post-build
@@ -150,8 +153,8 @@ inverter_uC_MMC.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "inverter_basic.obj" "syscfg\board.obj" "syscfg\c2000ware_libraries.obj" "device\device.obj" "device\f28002x_codestartbranch.obj" 
-	-$(RM) "inverter_basic.d" "syscfg\board.d" "syscfg\c2000ware_libraries.d" "device\device.d" 
+	-$(RM) "inverter_basic.obj" "syscfg\board.obj" "syscfg\c2000ware_libraries.obj" "inverter_uC_MMC.obj" "device\device.obj" "device\f28002x_codestartbranch.obj" 
+	-$(RM) "inverter_basic.d" "syscfg\board.d" "syscfg\c2000ware_libraries.d" "inverter_uC_MMC.d" "syscfg\board.d" "syscfg\c2000ware_libraries.d" "device\device.d" 
 	-$(RM) "device\f28002x_codestartbranch.d" 
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
 	-@echo 'Finished clean'
@@ -159,9 +162,9 @@ clean:
 
 post-build:
 	-echo "========= Build of the CLB simulation has moved to the CLB Tool. Click the '?' icon by the _Generate CLB Simulation File_ enable for more details (located in the Global Parameters of the Tile Design SysConfig module) ============="
-	-if 0 == 1  C:/ti/ccs1260/ccs/tools/node/node.exe "C:/ti/c2000/C2000Ware_5_01_00_00/utilities/clb_tool/clb_syscfg/dot_file_libraries/clbDotUtility.js"  "C:/ti/c2000/C2000Ware_5_01_00_00/utilities/clb_tool/clb_syscfg/" "C:/Users/alber/workspace_v12/inverter_uC_MMC/CPU1_RAM/syscfg" "C:/Users/alber/workspace_v12/inverter_uC_MMC/CPU1_RAM/syscfg/clb.dot"
-	-if 0 == 1  mkdir "C:/Users/alber/workspace_v12/inverter_uC_MMC/CPU1_RAM/diagrams"
-	-if 0 == 1  C:/ti/ccs1260/ccs/tools/node/node.exe "C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/.meta/generate_diagrams.js" "C:/ti/c2000/C2000Ware_5_01_00_00" "C:/Users/alber/workspace_v12/inverter_uC_MMC/CPU1_RAM/diagrams" "C:/Users/alber/workspace_v12/inverter_uC_MMC/CPU1_RAM/syscfg"
+	-if 0 == 1  C:/ti/ccs1260/ccs/tools/node/node.exe "C:/ti/c2000/C2000Ware_5_01_00_00/utilities/clb_tool/clb_syscfg/dot_file_libraries/clbDotUtility.js"  "C:/ti/c2000/C2000Ware_5_01_00_00/utilities/clb_tool/clb_syscfg/" "C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/CPU1_RAM/syscfg" "C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/CPU1_RAM/syscfg/clb.dot"
+	-if 0 == 1  mkdir "C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/CPU1_RAM/diagrams"
+	-if 0 == 1  C:/ti/ccs1260/ccs/tools/node/node.exe "C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/.meta/generate_diagrams.js" "C:/ti/c2000/C2000Ware_5_01_00_00" "C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/CPU1_RAM/diagrams" "C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/CPU1_RAM/syscfg"
 	-@echo ' '
 
 .PHONY: all clean dependents

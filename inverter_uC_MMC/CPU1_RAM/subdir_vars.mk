@@ -6,10 +6,13 @@ SHELL = cmd.exe
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CMD_SRCS += \
-../280023_RAM_lnk.cmd 
+../280023_RAM_lnk.cmd \
+../28002x_generic_flash_lnk.cmd \
+../28002x_generic_ram_lnk.cmd 
 
 SYSCFG_SRCS += \
-../inverter_basic.syscfg 
+../inverter_basic.syscfg \
+../inverter_uC_MMC.syscfg 
 
 LIB_SRCS += \
 C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib 
@@ -17,7 +20,8 @@ C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib
 C_SRCS += \
 ../inverter_basic.c \
 ./syscfg/board.c \
-./syscfg/c2000ware_libraries.c 
+./syscfg/c2000ware_libraries.c \
+../inverter_uC_MMC.c 
 
 GEN_FILES += \
 ./syscfg/board.c \
@@ -26,10 +30,14 @@ GEN_FILES += \
 ./syscfg/c2000ware_libraries.c 
 
 GEN_MISC_DIRS += \
+./syscfg \
 ./syscfg 
 
 C_DEPS += \
 ./inverter_basic.d \
+./syscfg/board.d \
+./syscfg/c2000ware_libraries.d \
+./inverter_uC_MMC.d \
 ./syscfg/board.d \
 ./syscfg/c2000ware_libraries.d 
 
@@ -40,9 +48,18 @@ GEN_OPTS += \
 OBJS += \
 ./inverter_basic.obj \
 ./syscfg/board.obj \
-./syscfg/c2000ware_libraries.obj 
+./syscfg/c2000ware_libraries.obj \
+./inverter_uC_MMC.obj 
 
 GEN_MISC_FILES += \
+./syscfg/board.h \
+./syscfg/board.cmd.genlibs \
+./syscfg/pinmux.csv \
+./syscfg/epwm.dot \
+./syscfg/adc.dot \
+./syscfg/c2000ware_libraries.cmd.genlibs \
+./syscfg/c2000ware_libraries.h \
+./syscfg/clocktree.h \
 ./syscfg/board.h \
 ./syscfg/board.cmd.genlibs \
 ./syscfg/pinmux.csv \
@@ -53,14 +70,24 @@ GEN_MISC_FILES += \
 ./syscfg/clocktree.h 
 
 GEN_MISC_DIRS__QUOTED += \
+"syscfg" \
 "syscfg" 
 
 OBJS__QUOTED += \
 "inverter_basic.obj" \
 "syscfg\board.obj" \
-"syscfg\c2000ware_libraries.obj" 
+"syscfg\c2000ware_libraries.obj" \
+"inverter_uC_MMC.obj" 
 
 GEN_MISC_FILES__QUOTED += \
+"syscfg\board.h" \
+"syscfg\board.cmd.genlibs" \
+"syscfg\pinmux.csv" \
+"syscfg\epwm.dot" \
+"syscfg\adc.dot" \
+"syscfg\c2000ware_libraries.cmd.genlibs" \
+"syscfg\c2000ware_libraries.h" \
+"syscfg\clocktree.h" \
 "syscfg\board.h" \
 "syscfg\board.cmd.genlibs" \
 "syscfg\pinmux.csv" \
@@ -73,6 +100,9 @@ GEN_MISC_FILES__QUOTED += \
 C_DEPS__QUOTED += \
 "inverter_basic.d" \
 "syscfg\board.d" \
+"syscfg\c2000ware_libraries.d" \
+"inverter_uC_MMC.d" \
+"syscfg\board.d" \
 "syscfg\c2000ware_libraries.d" 
 
 GEN_FILES__QUOTED += \
@@ -84,9 +114,11 @@ GEN_FILES__QUOTED += \
 C_SRCS__QUOTED += \
 "../inverter_basic.c" \
 "./syscfg/board.c" \
-"./syscfg/c2000ware_libraries.c" 
+"./syscfg/c2000ware_libraries.c" \
+"../inverter_uC_MMC.c" 
 
 SYSCFG_SRCS__QUOTED += \
-"../inverter_basic.syscfg" 
+"../inverter_basic.syscfg" \
+"../inverter_uC_MMC.syscfg" 
 
 

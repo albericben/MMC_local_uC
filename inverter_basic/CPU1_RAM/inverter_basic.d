@@ -1,7 +1,7 @@
 # FIXED
 
 inverter_basic.obj: ../inverter_basic.c
-inverter_basic.obj: C:/Users/alber/workspace_v12/inverter_basic/device/driverlib.h
+inverter_basic.obj: C:/Users/alber/Documents/MMC_local_uC/inverter_basic/device/driverlib.h
 inverter_basic.obj: C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/inc/hw_memmap.h
 inverter_basic.obj: C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/adc.h
 inverter_basic.obj: C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include/stdbool.h
@@ -86,12 +86,12 @@ inverter_basic.obj: C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib
 inverter_basic.obj: C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/inc/hw_spi.h
 inverter_basic.obj: C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/version.h
 inverter_basic.obj: C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/driver_inclusive_terminology_mapping.h
-inverter_basic.obj: C:/Users/alber/workspace_v12/inverter_basic/device/device.h
+inverter_basic.obj: C:/Users/alber/Documents/MMC_local_uC/inverter_basic/device/device.h
 inverter_basic.obj: syscfg/board.h
 
 ../inverter_basic.c:
 
-C:/Users/alber/workspace_v12/inverter_basic/device/driverlib.h:
+C:/Users/alber/Documents/MMC_local_uC/inverter_basic/device/driverlib.h:
 
 C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/inc/hw_memmap.h:
 
@@ -261,7 +261,7 @@ C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/version.h:
 
 C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/driver_inclusive_terminology_mapping.h:
 
-C:/Users/alber/workspace_v12/inverter_basic/device/device.h:
+C:/Users/alber/Documents/MMC_local_uC/inverter_basic/device/device.h:
 
 syscfg/board.h:
 
