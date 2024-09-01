@@ -21,9 +21,15 @@ build-1405915615: ../inverter_basic.syscfg
 
 syscfg/board.c: build-1405915615 ../inverter_basic.syscfg
 syscfg/board.h: build-1405915615
+syscfg/board.cmd.genlibs: build-1405915615
+syscfg/board.opt: build-1405915615
 syscfg/pinmux.csv: build-1405915615
 syscfg/epwm.dot: build-1405915615
 syscfg/adc.dot: build-1405915615
+syscfg/c2000ware_libraries.cmd.genlibs: build-1405915615
+syscfg/c2000ware_libraries.opt: build-1405915615
+syscfg/c2000ware_libraries.c: build-1405915615
+syscfg/c2000ware_libraries.h: build-1405915615
 syscfg/clocktree.h: build-1405915615
 syscfg: build-1405915615
 

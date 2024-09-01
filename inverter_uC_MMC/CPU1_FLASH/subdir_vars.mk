@@ -9,13 +9,13 @@ CMD_SRCS += \
 ../280023_FLASH_lnk.cmd 
 
 SYSCFG_SRCS += \
-../inverter_basic.syscfg 
+../inverter_uC_MMC.syscfg 
 
 LIB_SRCS += \
 C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib 
 
 C_SRCS += \
-../inverter_basic.c \
+../inverter_uC_MMC.c \
 ./syscfg/board.c \
 ./syscfg/c2000ware_libraries.c 
 
@@ -29,7 +29,7 @@ GEN_MISC_DIRS += \
 ./syscfg 
 
 C_DEPS += \
-./inverter_basic.d \
+./inverter_uC_MMC.d \
 ./syscfg/board.d \
 ./syscfg/c2000ware_libraries.d 
 
@@ -38,7 +38,7 @@ GEN_OPTS += \
 ./syscfg/c2000ware_libraries.opt 
 
 OBJS += \
-./inverter_basic.obj \
+./inverter_uC_MMC.obj \
 ./syscfg/board.obj \
 ./syscfg/c2000ware_libraries.obj 
 
@@ -56,7 +56,7 @@ GEN_MISC_DIRS__QUOTED += \
 "syscfg" 
 
 OBJS__QUOTED += \
-"inverter_basic.obj" \
+"inverter_uC_MMC.obj" \
 "syscfg\board.obj" \
 "syscfg\c2000ware_libraries.obj" 
 
@@ -71,7 +71,7 @@ GEN_MISC_FILES__QUOTED += \
 "syscfg\clocktree.h" 
 
 C_DEPS__QUOTED += \
-"inverter_basic.d" \
+"inverter_uC_MMC.d" \
 "syscfg\board.d" \
 "syscfg\c2000ware_libraries.d" 
 
@@ -82,11 +82,11 @@ GEN_FILES__QUOTED += \
 "syscfg\c2000ware_libraries.c" 
 
 C_SRCS__QUOTED += \
-"../inverter_basic.c" \
+"../inverter_uC_MMC.c" \
 "./syscfg/board.c" \
 "./syscfg/c2000ware_libraries.c" 
 
 SYSCFG_SRCS__QUOTED += \
-"../inverter_basic.syscfg" 
+"../inverter_uC_MMC.syscfg" 
 
 

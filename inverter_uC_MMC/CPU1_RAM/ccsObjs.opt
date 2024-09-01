@@ -1,5 +1,6 @@
 "./inverter_basic.obj"
 "./syscfg/board.obj"
+"./syscfg/c2000ware_libraries.obj"
 "./device/device.obj"
 "./device/f28002x_codestartbranch.obj"
 "../280023_RAM_lnk.cmd"

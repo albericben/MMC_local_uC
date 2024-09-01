@@ -97,16 +97,6 @@ extern "C"
 #define GPIO_PIN_EPWM3_B 5
 #define myEPWM3_EPWMB_GPIO 5
 #define myEPWM3_EPWMB_PIN_CONFIG GPIO_5_EPWM3_B
-
-//
-// EPWM5 -> myEPWM5 Pinmux
-//
-//
-// EPWM5_A - GPIO Settings
-//
-#define GPIO_PIN_EPWM5_A 16
-#define myEPWM5_EPWMA_GPIO 16
-#define myEPWM5_EPWMA_PIN_CONFIG GPIO_16_EPWM5_A
 //
 // GPIO0 - GPIO Settings
 //
@@ -139,6 +129,10 @@ extern "C"
 // GPIO33 - GPIO Settings
 //
 #define EN_in_GPIO_PIN_CONFIG GPIO_33_GPIO33
+//
+// GPIO16 - GPIO Settings
+//
+#define FAN_ctrl_out_GPIO_PIN_CONFIG GPIO_16_GPIO16
 
 //*****************************************************************************
 //
@@ -150,12 +144,12 @@ extern "C"
 #define myADC0_SOC0 ADC_SOC_NUMBER0
 #define myADC0_FORCE_SOC0 ADC_FORCE_SOC0
 #define myADC0_SAMPLE_WINDOW_SOC0 80
-#define myADC0_TRIGGER_SOURCE_SOC0 ADC_TRIGGER_SW_ONLY
+#define myADC0_TRIGGER_SOURCE_SOC0 ADC_TRIGGER_EPWM7_SOCB
 #define myADC0_CHANNEL_SOC0 ADC_CH_ADCIN0
 #define myADC0_SOC1 ADC_SOC_NUMBER1
 #define myADC0_FORCE_SOC1 ADC_FORCE_SOC1
 #define myADC0_SAMPLE_WINDOW_SOC1 80
-#define myADC0_TRIGGER_SOURCE_SOC1 ADC_TRIGGER_SW_ONLY
+#define myADC0_TRIGGER_SOURCE_SOC1 ADC_TRIGGER_EPWM7_SOCB
 #define myADC0_CHANNEL_SOC1 ADC_CH_ADCIN1
 #define myADC0_SOC2 ADC_SOC_NUMBER2
 #define myADC0_FORCE_SOC2 ADC_FORCE_SOC2
@@ -170,7 +164,7 @@ extern "C"
 #define myADC0_SOC5 ADC_SOC_NUMBER5
 #define myADC0_FORCE_SOC5 ADC_FORCE_SOC5
 #define myADC0_SAMPLE_WINDOW_SOC5 80
-#define myADC0_TRIGGER_SOURCE_SOC5 ADC_TRIGGER_SW_ONLY
+#define myADC0_TRIGGER_SOURCE_SOC5 ADC_TRIGGER_EPWM7_SOCB
 #define myADC0_CHANNEL_SOC5 ADC_CH_ADCIN5
 #define myADC0_SOC7 ADC_SOC_NUMBER7
 #define myADC0_FORCE_SOC7 ADC_FORCE_SOC7
@@ -227,7 +221,7 @@ void myCPUTIMER0_init();
 //
 //*****************************************************************************
 #define myEPWM4_BASE EPWM4_BASE
-#define myEPWM4_TBPRD 10000
+#define myEPWM4_TBPRD 20000
 #define myEPWM4_COUNTER_MODE EPWM_COUNTER_MODE_UP
 #define myEPWM4_TBPHS 0
 #define myEPWM4_CMPA 0
@@ -240,7 +234,7 @@ void myCPUTIMER0_init();
 #define myEPWM4_TZB_ACTION EPWM_TZ_ACTION_HIGH_Z
 #define myEPWM4_INTERRUPT_SOURCE EPWM_INT_TBCTR_ZERO
 #define myEPWM3_BASE EPWM3_BASE
-#define myEPWM3_TBPRD 8000
+#define myEPWM3_TBPRD 20000
 #define myEPWM3_COUNTER_MODE EPWM_COUNTER_MODE_UP
 #define myEPWM3_TBPHS 0
 #define myEPWM3_CMPA 0
@@ -252,19 +246,6 @@ void myCPUTIMER0_init();
 #define myEPWM3_TZA_ACTION EPWM_TZ_ACTION_HIGH_Z
 #define myEPWM3_TZB_ACTION EPWM_TZ_ACTION_HIGH_Z
 #define myEPWM3_INTERRUPT_SOURCE EPWM_INT_TBCTR_ZERO
-#define myEPWM5_BASE EPWM5_BASE
-#define myEPWM5_TBPRD 20000
-#define myEPWM5_COUNTER_MODE EPWM_COUNTER_MODE_UP
-#define myEPWM5_TBPHS 0
-#define myEPWM5_CMPA 10000
-#define myEPWM5_CMPB 0
-#define myEPWM5_CMPC 0
-#define myEPWM5_CMPD 0
-#define myEPWM5_DBRED 0
-#define myEPWM5_DBFED 0
-#define myEPWM5_TZA_ACTION EPWM_TZ_ACTION_HIGH_Z
-#define myEPWM5_TZB_ACTION EPWM_TZ_ACTION_HIGH_Z
-#define myEPWM5_INTERRUPT_SOURCE EPWM_INT_TBCTR_ZERO
 
 //*****************************************************************************
 //
@@ -287,6 +268,8 @@ void RDY_out_init();
 void ENA_out_init();
 #define EN_in 33
 void EN_in_init();
+#define FAN_ctrl_out 16
+void FAN_ctrl_out_init();
 
 //*****************************************************************************
 //

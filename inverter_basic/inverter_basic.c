@@ -63,9 +63,13 @@
 //
 // Defines
 //
-#define EPWM3_TIMER_TBPRD  2000US
-#define EPWM3_MAX_CMPB     1600U
-#define EPWM3_MIN_CMPB      400U
+#define EPWM3_TIMER_TBPRD  10000US
+#define EPWM3_MAX_CMPB      9000U
+#define EPWM3_MIN_CMPB      1000U
+
+#define EPWM5_TIMER_TBPRD  20000US
+#define EPWM5_MAX_CMPB     16000U
+#define EPWM5_MIN_CMPB      4000U
 
 #define EPWM_CMP_UP           1U
 #define EPWM_CMP_DOWN         0U
@@ -91,198 +95,74 @@ typedef struct
 epwmInformation epwm2Info;
 epwmInformation epwm3Info;
 
-//
-// Globals for ADC read of pins
-//
-uint16_t adc_raw_ntc1;   // NTC1 PIN
-uint16_t adc_raw_ntc2;   // NTC2 PIN
-uint16_t adc_raw_iac1;   // G1_CUR PIN
-uint16_t adc_raw_iac2;   // G2_CUR PIN
-uint16_t adc_raw_fans;   // FAN_SENS PIN
-uint16_t adc_raw_vdc1;   // DC1_LNK PIN
-uint16_t adc_raw_vdc2;  // DC2_LNK PIN
-uint16_t adc_raw_vac1;  // G1_VLT PIN
-uint16_t adc_raw_vac2;  // G2_VLT PIN
+void updateCompare(epwmInformation *epwmInfo);
 
 //
 // Function Prototypes
 //
-void initEPWM();        // ADC Read Trigger
 void initEPWM2(void);   // SIG A
 void initEPWM3(void);   // SIG B
-__interrupt void adcA1ISR(void);
+
 __interrupt void epwm2ISR(void);
 __interrupt void epwm3ISR(void);
 __interrupt void gbl_flt_ISR(void);
-__interrupt void gbl_enbl_ISR(void);
-void updateCompare(epwmInformation *epwmInfo);
 
 //
 // Main
 //
 void main(void)
 {
-    //
+//    uint8_t tx_can_msg = 1;
+
     // Initialize device clock and peripherals
-    //
     Device_init();
 
-    //
     // Disable pin locks and enable internal pull ups.
-    //
     Device_initGPIO();
 
-    //
     // Initialize PIE and clear PIE registers. Disables CPU interrupts.
-    //
     Interrupt_initModule();
 
-    //
     // Initialize the PIE vector table with pointers to the shell Interrupt
     // Service Routines (ISR).
-    //
     Interrupt_initVectorTable();
 
-    //
     // Assign the interrupt service routines to ePWM interrupts
-    //
-//    Interrupt_register(INT_ADCA1, &adcA1ISR);
     Interrupt_register(INT_EPWM3, &epwm2ISR);
     Interrupt_register(INT_EPWM4, &epwm3ISR);
 
 
-    //
     // Disable sync(Freeze clock to PWM as well)
-    //
     SysCtl_disablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
 
-    //
     // Configure GPIO0/1 , GPIO2/3 and GPIO4/5 as ePWM1A/1B, ePWM2A/2B and
     // ePWM3A/3B pins respectively
     // Configure EPWM Modules
-    //
     Board_init();
 
-    initEPWM();
     initEPWM2();
     initEPWM3();
 
-    //
+    GPIO_setDirectionMode(ENA_out, GPIO_DIR_MODE_OUT);
+    GPIO_writePin(ENA_out, 1);
+
     // Enable sync and clock to PWM
-    //
     SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
 
-    //
     // Enable ePWM interrupts
-    //
     Interrupt_enable(INT_EPWM3);
     Interrupt_enable(INT_EPWM4);
-//    Interrupt_enable(INT_ADCA1);
 
-    //
     // Enable Global Interrupt (INTM) and realtime interrupt (DBGM)
-    //
     EINT;
     ERTM;
 
-    //
     // Start ePWM7, enabling SOCB and putting the counter in up-count mode
-    //
     EPWM_enableADCTrigger(EPWM7_BASE, EPWM_SOC_B);
     EPWM_setTimeBaseCounterMode(EPWM7_BASE, EPWM_COUNTER_MODE_UP);
 
-    //
-    // IDLE loop. Just sit and loop forever (optional):
-    //
-    for(;;)
-    {
-
-        // Low priority reads for fan control - could be moved to slower timer
-        adc_raw_ntc1 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER0);   // NTC1
-        adc_raw_ntc2 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER1);   // NTC2
-        adc_raw_fans = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER5);   // FAN_SENS
-    }
-}
-
-//
-// epwm2ISR - ePWM 2 ISR
-//
-__interrupt void epwm2ISR(void)
-{
-    //
-    // Update the CMPA and CMPB values
-    //
-    updateCompare(&epwm2Info);
-
-    //
-    // Clear INT flag for this timer
-    //
-    EPWM_clearEventTriggerInterruptFlag(myEPWM3_BASE);
-
-    //
-    // Acknowledge interrupt group
-    //
-    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP3);
-}
-
-//
-// epwm3ISR - ePWM 3 ISR
-//
-__interrupt void epwm3ISR(void)
-{
-//    //
-//    // Update the CMPA and CMPB values
-//    //
-    updateCompare(&epwm3Info);
-
-    //
-    // Clear INT flag for this timer
-    //
-    EPWM_clearEventTriggerInterruptFlag(myEPWM4_BASE);
-
-    //
-    // Acknowledge interrupt group
-    //
-    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP3);
-}
-
-//
-// Function to configure ePWM7 to generate the SOC.
-//
-void initEPWM(void)
-{
-    //
-    // Disable SOCA
-    //
-    EPWM_disableADCTrigger(EPWM7_BASE, EPWM_SOC_B);
-
-    //
-    // Configure the SOC to occur on the first up-count event
-    //
-    EPWM_setADCTriggerSource(EPWM7_BASE, EPWM_SOC_B, EPWM_SOC_TBCTR_U_CMPB);
-    EPWM_setADCTriggerEventPrescale(EPWM7_BASE, EPWM_SOC_B, 1);
-
-    //
-    // Set the compare B value to 1000 and the period to 1999
-    // Assuming ePWM clock is 100MHz, this would give 50kHz sampling
-    // 50MHz ePWM clock would give 25kHz sampling, etc.
-    // The sample rate can also be modulated by changing the ePWM period
-    // directly (ensure that the compare A value is less than the period).
-    //
-    EPWM_setCounterCompareValue(EPWM7_BASE, EPWM_COUNTER_COMPARE_B, 6000);
-    EPWM_setTimeBasePeriod(EPWM7_BASE, 11999);
-
-    //
-    // Set the local ePWM module clock divider to /1
-    //
-    EPWM_setClockPrescaler(EPWM7_BASE,
-                           EPWM_CLOCK_DIVIDER_1,
-                           EPWM_HSCLOCK_DIVIDER_1);
-
-    //
-    // Freeze the counter
-    //
-    EPWM_setTimeBaseCounterMode(EPWM7_BASE, EPWM_COUNTER_MODE_STOP_FREEZE);
+    GPIO_writePin(ENA_out, 1);
+    GPIO_writePin(ENB_out, 1);
 }
 
 //
@@ -321,93 +201,59 @@ void initEPWM3(void)
     epwm3Info.epwmMinCompB = EPWM3_MIN_CMPB;
 }
 
-//
-// ADC A Interrupt 1 ISR
-//
-__interrupt void adcA1ISR(void)
-{
-    //
-    // Store results
-    //
-    adc_raw_iac1 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER2);   // G1_CUR
-    adc_raw_iac2 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER3);   // G2_CUR
-    adc_raw_vdc1 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER7);   // DC1_LNK
-    adc_raw_vdc2 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER10);  // DC2_LNK
-    adc_raw_vac1 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER11);  // G1_VLT
-    adc_raw_vac2 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER15);  // G2_VLT
-
-    //
-    // Clear the interrupt flag
-    //
-    ADC_clearInterruptStatus(ADCA_BASE, ADC_INT_NUMBER1);
-
-    //
-    // Check if overflow has occurred
-    //
-    if(true == ADC_getInterruptOverflowStatus(ADCA_BASE, ADC_INT_NUMBER1))
-    {
-        ADC_clearInterruptOverflowStatus(ADCA_BASE, ADC_INT_NUMBER1);
-        ADC_clearInterruptStatus(ADCA_BASE, ADC_INT_NUMBER1);
-    }
-
-    //
-    // Acknowledge the interrupt
-    //
-    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
-}
-
 __interrupt void gbl_flt_ISR(void)
 {
     // Write code to handle fault - STOP ALL GATE signaling
     GPIO_writePin(ENA_out, 0);
     GPIO_writePin(ENB_out, 0);
 
-    //
     // Acknowledge the interrupt
-    //
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
 }
 
-__interrupt void gbl_enbl_ISR(void)
+//
+// epwm2ISR - ePWM 2 ISR
+//
+__interrupt void epwm2ISR(void)
 {
-    uint32_t enable_val;
-    enable_val = GPIO_readPin(EN_in);
+    // Update the CMPA and CMPB values
+//    updateCompare(&epwm2Info);
 
-    GPIO_writePin(ENA_out, enable_val);
-    GPIO_writePin(ENB_out, enable_val);
+    // Clear INT flag for this timer
+    EPWM_clearEventTriggerInterruptFlag(myEPWM3_BASE);
 
-    //
-    // Acknowledge the interrupt
-    //
-    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
+    // Acknowledge interrupt group
+    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP3);
 }
 
 //
-// updateCompare - Function to update the frequency
+// epwm3ISR - ePWM 3 ISR
 //
+__interrupt void epwm3ISR(void)
+{
+    // Update the CMPA and CMPB values
+//    updateCompare(&epwm3Info);
+
+    // Clear INT flag for this timer
+    EPWM_clearEventTriggerInterruptFlag(myEPWM4_BASE);
+
+    // Acknowledge interrupt group
+    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP3);
+}
+
+
 void updateCompare(epwmInformation *epwmInfo)
 {
-//    uint16_t compAValue;
     uint16_t compBValue;
-
-//    compAValue = EPWM_getCounterCompareValue(epwmInfo->epwmModule,
-//                                             EPWM_COUNTER_COMPARE_A);
 
     compBValue = EPWM_getCounterCompareValue(epwmInfo->epwmModule,
                                              EPWM_COUNTER_COMPARE_B);
 
-    //
-    //  Change the CMPA/CMPB values every 10th interrupt.
-    //
+    //  Change the CMPB values every 10th interrupt.
     if(epwmInfo->epwmTimerIntCount == 10U)
     {
         epwmInfo->epwmTimerIntCount = 0U;
 
-        //
-        // If we were increasing CMPB, check to see if we reached the max
-        // value. If not, increase CMPB else, change directions and decrease
-        // CMPB
-        //
         if(epwmInfo->epwmCompBDirection == EPWM_CMP_UP)
         {
             if(compBValue < (epwmInfo->epwmMaxCompB))
@@ -424,11 +270,6 @@ void updateCompare(epwmInformation *epwmInfo)
                                             --compBValue);
             }
         }
-        //
-        // If we were decreasing CMPB, check to see if we reached the min
-        // value. If not, decrease CMPB else, change directions and increase
-        // CMPB
-        //
         else
         {
             if(compBValue == (epwmInfo->epwmMinCompB))

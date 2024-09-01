@@ -10,7 +10,7 @@ GEN_OPTS__FLAG := --cmd_file="syscfg/board.opt" --cmd_file="syscfg/c2000ware_lib
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
-"./inverter_basic.obj" \
+"./inverter_uC_MMC.obj" \
 "./syscfg/board.obj" \
 "./syscfg/c2000ware_libraries.obj" \
 "./device/device.obj" \
@@ -150,8 +150,8 @@ inverter_uC_MMC.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "inverter_basic.obj" "syscfg\board.obj" "syscfg\c2000ware_libraries.obj" "device\device.obj" "device\f28002x_codestartbranch.obj" 
-	-$(RM) "inverter_basic.d" "syscfg\board.d" "syscfg\c2000ware_libraries.d" "device\device.d" 
+	-$(RM) "inverter_uC_MMC.obj" "syscfg\board.obj" "syscfg\c2000ware_libraries.obj" "device\device.obj" "device\f28002x_codestartbranch.obj" 
+	-$(RM) "inverter_uC_MMC.d" "syscfg\board.d" "syscfg\c2000ware_libraries.d" "device\device.d" 
 	-$(RM) "device\f28002x_codestartbranch.d" 
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
 	-@echo 'Finished clean'

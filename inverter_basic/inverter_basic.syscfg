@@ -1,15 +1,13 @@
 /**
  * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
  * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
- * @cliArgs --device "F28002x" --package "48QFP" --part "F28002x_48QFP" --context "system" --product "C2000WARE@5.01.00.00"
+ * @cliArgs --device "F28002x" --package "80QFP" --part "F28002x_80QFP" --context "system" --product "C2000WARE@5.01.00.00"
  * @versions {"tool":"1.19.0+3426"}
  */
 
 /**
  * Import the modules used in this configuration.
  */
-const adc              = scripting.addModule("/driverlib/adc.js", {}, false);
-const adc1             = adc.addInstance();
 const analog           = scripting.addModule("/driverlib/analog.js", {}, false);
 const analog1          = analog.addInstance();
 const asysctl          = scripting.addModule("/driverlib/asysctl.js");
@@ -21,10 +19,6 @@ const gpio1            = gpio.addInstance();
 const gpio2            = gpio.addInstance();
 const gpio3            = gpio.addInstance();
 const gpio4            = gpio.addInstance();
-const gpio5            = gpio.addInstance();
-const gpio6            = gpio.addInstance();
-const gpio7            = gpio.addInstance();
-const gpio8            = gpio.addInstance();
 const inputxbar_input  = scripting.addModule("/driverlib/inputxbar_input.js", {}, false);
 const inputxbar_input1 = inputxbar_input.addInstance();
 const inputxbar_input2 = inputxbar_input.addInstance();
@@ -33,56 +27,7 @@ const sync             = scripting.addModule("/driverlib/sync.js");
 /**
  * Write custom configuration values to the imported modules.
  */
-adc1.$name                          = "myADC0";
-adc1.adcClockPrescaler              = "ADC_CLK_DIV_2_0";
-adc1.soc6SampleWindow               = 10;
-adc1.soc8SampleWindow               = 10;
-adc1.soc9SampleWindow               = 10;
-adc1.soc12SampleWindow              = 10;
-adc1.soc13SampleWindow              = 10;
-adc1.soc14SampleWindow              = 10;
-adc1.interruptPulseMode             = "ADC_PULSE_END_OF_CONV";
-adc1.interrupt2SOCSource            = "ADC_SOC_NUMBER14";
-adc1.enableInterrupt2ContinuousMode = true;
-adc1.interrupt3SOCSource            = "ADC_SOC_NUMBER7";
-adc1.enableInterrupt3ContinuousMode = true;
-adc1.interrupt4SOCSource            = "ADC_SOC_NUMBER15";
-adc1.enableInterrupt4ContinuousMode = true;
-adc1.soc0SampleWindow               = 8;
-adc1.soc1Channel                    = "ADC_CH_ADCIN1";
-adc1.soc1SampleWindow               = 8;
-adc1.soc2SampleWindow               = 8;
-adc1.soc2Channel                    = "ADC_CH_ADCIN2";
-adc1.soc3SampleWindow               = 8;
-adc1.soc3Channel                    = "ADC_CH_ADCIN3";
-adc1.soc4Channel                    = "ADC_CH_ADCIN5";
-adc1.soc4SampleWindow               = 8;
-adc1.enabledSOCs                    = ["ADC_SOC_NUMBER0","ADC_SOC_NUMBER1","ADC_SOC_NUMBER10","ADC_SOC_NUMBER11","ADC_SOC_NUMBER15","ADC_SOC_NUMBER2","ADC_SOC_NUMBER3","ADC_SOC_NUMBER5","ADC_SOC_NUMBER7"];
-adc1.soc5Channel                    = "ADC_CH_ADCIN5";
-adc1.soc5SampleWindow               = 8;
-adc1.soc7Channel                    = "ADC_CH_ADCIN7";
-adc1.soc10Channel                   = "ADC_CH_ADCIN10";
-adc1.soc7SampleWindow               = 8;
-adc1.soc10SampleWindow              = 8;
-adc1.soc11SampleWindow              = 8;
-adc1.soc11Channel                   = "ADC_CH_ADCIN11";
-adc1.soc15SampleWindow              = 8;
-adc1.soc15Channel                   = "ADC_CH_ADCIN15";
-adc1.enabledInts                    = ["ADC_INT_NUMBER1"];
-adc1.enableInterrupt1               = true;
-adc1.interrupt1SOCSource            = "ADC_SOC_NUMBER15";
-adc1.registerInterrupts             = ["1"];
-adc1.soc2Trigger                    = "ADC_TRIGGER_EPWM7_SOCB";
-adc1.soc3Trigger                    = "ADC_TRIGGER_EPWM7_SOCB";
-adc1.soc7Trigger                    = "ADC_TRIGGER_EPWM7_SOCB";
-adc1.soc10Trigger                   = "ADC_TRIGGER_EPWM7_SOCB";
-adc1.soc11Trigger                   = "ADC_TRIGGER_EPWM7_SOCB";
-adc1.soc15Trigger                   = "ADC_TRIGGER_EPWM7_SOCB";
-adc1.adcInt1.interruptHandler       = "adcA1ISR";
-adc1.adcInt1.enableInterrupt        = true;
-
 analog1.$name                           = "myANALOGPinMux0";
-adc1.analog                             = analog1;
 analog1.useCase                         = "CUSTOM";
 analog1.useInterfacePins                = ["A0/C15","A1","A10/C10","A11/C0","A15/C7","A2/C9","A3/C5/VDAC","A5/C2","A7/C3"];
 analog1.analog.$assign                  = "ANALOG";
@@ -99,7 +44,6 @@ analog1.analog["a7/c3Pin"].$assign      = "A7/C3";
 asysctl.analogReference        = "INTERNAL";
 asysctl.analogReferenceVoltage = "1P65";
 
-epwm1.epwmTimebase_period                                      = 2000;
 epwm1.epwmTimebase_hsClockDiv                                  = "EPWM_HSCLOCK_DIVIDER_1";
 epwm1.epwmEventTrigger_enableInterrupt                         = true;
 epwm1.epwmEventTrigger_interruptSource                         = "EPWM_INT_TBCTR_ZERO";
@@ -119,13 +63,13 @@ epwm1.epwmActionQualifier_continousSwForceReloadMode           = "EPWM_AQ_SW_IMM
 epwm1.epwmTimebase_syncInPulseSource                           = "EPWM_SYNC_IN_PULSE_SRC_SYNCOUT_EPWM4";
 epwm1.epwmActionQualifier_continousSwForceReloadModeGld        = true;
 epwm1.epwmTimebase_counterMode                                 = "EPWM_COUNTER_MODE_UP";
-epwm1.epwmCounterCompare_cmpB                                  = 1000;
 epwm1.epwmActionQualifier_EPWM_AQ_OUTPUT_B_ON_TIMEBASE_UP_CMPB = "EPWM_AQ_OUTPUT_LOW";
 epwm1.epwmActionQualifier_EPWM_AQ_OUTPUT_B_ON_TIMEBASE_ZERO    = "EPWM_AQ_OUTPUT_HIGH";
+epwm1.epwmTimebase_period                                      = 20000;
+epwm1.epwmCounterCompare_cmpB                                  = 10000;
 epwm1.epwm.$assign                                             = "EPWM4";
 epwm1.epwm.epwm_bPin.$assign                                   = "GPIO7";
 
-epwm2.epwmTimebase_period                                      = 2000;
 epwm2.epwmTimebase_hsClockDiv                                  = "EPWM_HSCLOCK_DIVIDER_1";
 epwm2.epwmEventTrigger_enableInterrupt                         = true;
 epwm2.epwmEventTrigger_interruptSource                         = "EPWM_INT_TBCTR_ZERO";
@@ -147,58 +91,40 @@ epwm2.$name                                                    = "myEPWM3";
 epwm2.epwmActionQualifier_EPWM_AQ_OUTPUT_B_ON_TIMEBASE_UP_CMPB = "EPWM_AQ_OUTPUT_HIGH";
 epwm2.epwmActionQualifier_EPWM_AQ_OUTPUT_B_ON_TIMEBASE_PERIOD  = "EPWM_AQ_OUTPUT_LOW";
 epwm2.epwmTimebase_counterMode                                 = "EPWM_COUNTER_MODE_UP";
-epwm2.epwmCounterCompare_cmpB                                  = 1000;
+epwm2.epwmTimebase_period                                      = 20000;
+epwm2.epwmCounterCompare_cmpB                                  = 10000;
 epwm2.epwm.$assign                                             = "EPWM3";
 epwm2.epwm.epwm_bPin.$assign                                   = "GPIO5";
 
-gpio1.padConfig       = "PULLUP";
-gpio1.$name           = "CSIG2_in";
-gpio1.gpioPin.$assign = "GPIO0";
+gpio1.$name                      = "FLTN_in";
+gpio1.padConfig                  = "PULLUP";
+gpio1.useInterrupt               = true;
+gpio1.gpioPin.$assign            = "GPIO4";
+gpio1.xint.enableInt             = true;
+gpio1.xint.registerInterrupts    = true;
+gpio1.xint.xInt.interruptHandler = "gbl_flt_ISR";
+gpio1.xint.xInt.enableInterrupt  = true;
 
-gpio2.$name           = "CSIG1_in";
-gpio2.padConfig       = "PULLUP";
-gpio2.gpioPin.$assign = "GPIO1";
+gpio2.$name           = "ENB_out";
+gpio2.direction       = "GPIO_DIR_MODE_OUT";
+gpio2.gpioPin.$assign = "GPIO6";
 
-gpio3.$name                      = "FLTN_in";
-gpio3.padConfig                  = "PULLUP";
-gpio3.useInterrupt               = true;
-gpio3.gpioPin.$assign            = "GPIO4";
-gpio3.xint.enableInt             = true;
-gpio3.xint.registerInterrupts    = true;
-gpio3.xint.xInt.interruptHandler = "gbl_flt_ISR";
+gpio3.padConfig         = "OD";
+gpio3.direction         = "GPIO_DIR_MODE_OUT";
+gpio3.$name             = "RDY_out";
+gpio3.writeInitialValue = true;
+gpio3.initialValue      = 1;
+gpio3.gpioPin.$assign   = "GPIO24";
 
-gpio4.$name           = "ENB_out";
+gpio4.$name           = "ENA_out";
 gpio4.direction       = "GPIO_DIR_MODE_OUT";
-gpio4.gpioPin.$assign = "GPIO6";
-
-gpio5.$name           = "GSYNC_in";
-gpio5.padConfig       = "PULLUP";
-gpio5.gpioPin.$assign = "GPIO12";
-
-gpio6.padConfig       = "OD";
-gpio6.direction       = "GPIO_DIR_MODE_OUT";
-gpio6.$name           = "RDY_out";
-gpio6.gpioPin.$assign = "GPIO24";
-
-gpio7.$name           = "ENA_out";
-gpio7.direction       = "GPIO_DIR_MODE_OUT";
-gpio7.padConfig       = "PULLUP";
-gpio7.gpioPin.$assign = "GPIO32";
-
-gpio8.$name                      = "EN_in";
-gpio8.useInterrupt               = true;
-gpio8.padConfig                  = "PULLUP";
-gpio8.gpioPin.$assign            = "GPIO33";
-gpio8.xint.xintNum               = "GPIO_INT_XINT2";
-gpio8.xint.intType               = "GPIO_INT_TYPE_BOTH_EDGES";
-gpio8.xint.enableInt             = true;
-gpio8.xint.registerInterrupts    = true;
-gpio8.xint.xInt.interruptHandler = "gbl_enbl_ISR";
+gpio4.padConfig       = "PULLUP";
+gpio4.gpioPin.$assign = "GPIO32";
 
 inputxbar_input1.$name         = "myINPUTXBARINPUT0";
-gpio3.xint.inputxbar           = inputxbar_input1;
+gpio1.xint.inputxbar           = inputxbar_input1;
 inputxbar_input1.inputxbarGpio = "GPIO4";
 
-inputxbar_input2.$name         = "myINPUTXBARINPUT1";
-gpio8.xint.inputxbar           = inputxbar_input2;
-inputxbar_input2.inputxbarGpio = "GPIO33";
+inputxbar_input2.$name          = "myINPUTXBARINPUT1";
+inputxbar_input2.inputxbarInput = "XBAR_INPUT5";
+inputxbar_input2.inputxbarGpio  = "GPIO33";

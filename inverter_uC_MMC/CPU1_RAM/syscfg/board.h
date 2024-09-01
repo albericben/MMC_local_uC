@@ -97,16 +97,6 @@ extern "C"
 #define GPIO_PIN_EPWM3_B 5
 #define myEPWM3_EPWMB_GPIO 5
 #define myEPWM3_EPWMB_PIN_CONFIG GPIO_5_EPWM3_B
-
-//
-// EPWM5 -> myEPWM5 Pinmux
-//
-//
-// EPWM5_A - GPIO Settings
-//
-#define GPIO_PIN_EPWM5_A 16
-#define myEPWM5_EPWMA_GPIO 16
-#define myEPWM5_EPWMA_PIN_CONFIG GPIO_16_EPWM5_A
 //
 // GPIO0 - GPIO Settings
 //
@@ -120,9 +110,9 @@ extern "C"
 //
 #define FLTN_in_GPIO_PIN_CONFIG GPIO_4_GPIO4
 //
-// GPIO6 - GPIO Settings
+// GPIO16 - GPIO Settings
 //
-#define ENB_out_GPIO_PIN_CONFIG GPIO_6_GPIO6
+#define ENB_out_GPIO_PIN_CONFIG GPIO_16_GPIO16
 //
 // GPIO12 - GPIO Settings
 //
@@ -139,6 +129,10 @@ extern "C"
 // GPIO33 - GPIO Settings
 //
 #define EN_in_GPIO_PIN_CONFIG GPIO_33_GPIO33
+//
+// GPIO30 - GPIO Settings
+//
+#define FAN_ctrl_out_GPIO_PIN_CONFIG GPIO_30_GPIO30
 
 //*****************************************************************************
 //
@@ -209,7 +203,7 @@ void myADC0_init();
 #define myCAN0_BASE CANA_BASE
 
 #define myCAN0_MessageObj1_ID 357913941
-#define myCAN0_MessageObj2_ID 1
+#define myCAN0_MessageObj2_ID 357913941
 void myCAN0_init();
 
 
@@ -252,19 +246,6 @@ void myCPUTIMER0_init();
 #define myEPWM3_TZA_ACTION EPWM_TZ_ACTION_HIGH_Z
 #define myEPWM3_TZB_ACTION EPWM_TZ_ACTION_HIGH_Z
 #define myEPWM3_INTERRUPT_SOURCE EPWM_INT_TBCTR_ZERO
-#define myEPWM5_BASE EPWM5_BASE
-#define myEPWM5_TBPRD 20000
-#define myEPWM5_COUNTER_MODE EPWM_COUNTER_MODE_UP
-#define myEPWM5_TBPHS 0
-#define myEPWM5_CMPA 10000
-#define myEPWM5_CMPB 0
-#define myEPWM5_CMPC 0
-#define myEPWM5_CMPD 0
-#define myEPWM5_DBRED 0
-#define myEPWM5_DBFED 0
-#define myEPWM5_TZA_ACTION EPWM_TZ_ACTION_HIGH_Z
-#define myEPWM5_TZB_ACTION EPWM_TZ_ACTION_HIGH_Z
-#define myEPWM5_INTERRUPT_SOURCE EPWM_INT_TBCTR_ZERO
 
 //*****************************************************************************
 //
@@ -277,7 +258,7 @@ void CSIG2_in_init();
 void CSIG1_in_init();
 #define FLTN_in 4
 void FLTN_in_init();
-#define ENB_out 6
+#define ENB_out 16
 void ENB_out_init();
 #define GSYNC_in 12
 void GSYNC_in_init();
@@ -287,6 +268,8 @@ void RDY_out_init();
 void ENA_out_init();
 #define EN_in 33
 void EN_in_init();
+#define FAN_ctrl_out 30
+void FAN_ctrl_out_init();
 
 //*****************************************************************************
 //

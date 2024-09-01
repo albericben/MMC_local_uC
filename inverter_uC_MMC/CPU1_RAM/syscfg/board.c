@@ -137,21 +137,14 @@ void PinMux_init()
 	GPIO_setPadConfig(myEPWM3_EPWMB_GPIO, GPIO_PIN_TYPE_STD);
 	GPIO_setQualificationMode(myEPWM3_EPWMB_GPIO, GPIO_QUAL_SYNC);
 
-	//
-	// EPWM5 -> myEPWM5 Pinmux
-	//
-	GPIO_setPinConfig(myEPWM5_EPWMA_PIN_CONFIG);
-	GPIO_setPadConfig(myEPWM5_EPWMA_GPIO, GPIO_PIN_TYPE_STD);
-	GPIO_setQualificationMode(myEPWM5_EPWMA_GPIO, GPIO_QUAL_SYNC);
-
 	// GPIO0 -> CSIG2_in Pinmux
 	GPIO_setPinConfig(GPIO_0_GPIO0);
 	// GPIO1 -> CSIG1_in Pinmux
 	GPIO_setPinConfig(GPIO_1_GPIO1);
 	// GPIO4 -> FLTN_in Pinmux
 	GPIO_setPinConfig(GPIO_4_GPIO4);
-	// GPIO6 -> ENB_out Pinmux
-	GPIO_setPinConfig(GPIO_6_GPIO6);
+	// GPIO16 -> ENB_out Pinmux
+	GPIO_setPinConfig(GPIO_16_GPIO16);
 	// GPIO12 -> GSYNC_in Pinmux
 	GPIO_setPinConfig(GPIO_12_GPIO12);
 	// GPIO24 -> RDY_out Pinmux
@@ -160,6 +153,8 @@ void PinMux_init()
 	GPIO_setPinConfig(GPIO_32_GPIO32);
 	// GPIO33 -> EN_in Pinmux
 	GPIO_setPinConfig(GPIO_33_GPIO33);
+	// GPIO30 -> FAN_ctrl_out Pinmux
+	GPIO_setPinConfig(GPIO_30_GPIO30);
 
 }
 
@@ -388,14 +383,14 @@ void myCAN0_init(){
 	//      Message Type: CAN_MSG_OBJ_TYPE_TX
 	//      Message ID Mask: 0
 	//      Message Object Flags: CAN_MSG_OBJ_TX_INT_ENABLE
-	//      Message Data Length: 8 Bytes
+	//      Message Data Length: 4 Bytes
 	//
-	CAN_setupMessageObject(myCAN0_BASE, 1, myCAN0_MessageObj1_ID, CAN_MSG_FRAME_EXT,CAN_MSG_OBJ_TYPE_TX, 0, CAN_MSG_OBJ_TX_INT_ENABLE,8);
+	CAN_setupMessageObject(myCAN0_BASE, 1, myCAN0_MessageObj1_ID, CAN_MSG_FRAME_EXT,CAN_MSG_OBJ_TYPE_TX, 0, CAN_MSG_OBJ_TX_INT_ENABLE,4);
 	//
 	// Initialize the transmit message object used for sending CAN messages.
 	// Message Object Parameters:
 	//      Message Object ID Number: 2
-	//      Message Identifier: 1
+	//      Message Identifier: 357913941
 	//      Message Frame: CAN_MSG_FRAME_EXT
 	//      Message Type: CAN_MSG_OBJ_TYPE_RX
 	//      Message ID Mask: 0
@@ -516,45 +511,6 @@ void EPWM_init(){
     EPWM_enableInterrupt(myEPWM3_BASE);	
     EPWM_setInterruptSource(myEPWM3_BASE, EPWM_INT_TBCTR_ZERO);	
     EPWM_setInterruptEventCount(myEPWM3_BASE, 3);	
-    EPWM_setClockPrescaler(myEPWM5_BASE, EPWM_CLOCK_DIVIDER_1, EPWM_HSCLOCK_DIVIDER_1);	
-    EPWM_setTimeBasePeriod(myEPWM5_BASE, 20000);	
-    EPWM_enableGlobalLoadRegisters(myEPWM5_BASE, EPWM_GL_REGISTER_TBPRD_TBPRDHR);	
-    EPWM_setTimeBaseCounter(myEPWM5_BASE, 0);	
-    EPWM_setTimeBaseCounterMode(myEPWM5_BASE, EPWM_COUNTER_MODE_UP);	
-    EPWM_disablePhaseShiftLoad(myEPWM5_BASE);	
-    EPWM_setPhaseShift(myEPWM5_BASE, 0);	
-    EPWM_setSyncInPulseSource(myEPWM5_BASE, EPWM_SYNC_IN_PULSE_SRC_SYNCOUT_EPWM4);	
-    EPWM_setCounterCompareValue(myEPWM5_BASE, EPWM_COUNTER_COMPARE_A, 10000);	
-    EPWM_enableGlobalLoadRegisters(myEPWM5_BASE, EPWM_GL_REGISTER_CMPA_CMPAHR);	
-    EPWM_disableCounterCompareShadowLoadMode(myEPWM5_BASE, EPWM_COUNTER_COMPARE_A);	
-    EPWM_setCounterCompareShadowLoadMode(myEPWM5_BASE, EPWM_COUNTER_COMPARE_A, EPWM_COMP_LOAD_ON_CNTR_ZERO);	
-    EPWM_setCounterCompareValue(myEPWM5_BASE, EPWM_COUNTER_COMPARE_B, 0);	
-    EPWM_disableCounterCompareShadowLoadMode(myEPWM5_BASE, EPWM_COUNTER_COMPARE_B);	
-    EPWM_setCounterCompareShadowLoadMode(myEPWM5_BASE, EPWM_COUNTER_COMPARE_B, EPWM_COMP_LOAD_ON_CNTR_ZERO);	
-    EPWM_setupEPWMLinks(myEPWM5_BASE, EPWM_LINK_WITH_EPWM_4, EPWM_LINK_COMP_B);	
-    EPWM_enableGlobalLoadRegisters(myEPWM5_BASE, EPWM_GL_REGISTER_AQCSFRC);	
-    EPWM_setActionQualifierContSWForceShadowMode(myEPWM5_BASE, EPWM_AQ_SW_IMMEDIATE_LOAD);	
-    EPWM_enableGlobalLoadRegisters(myEPWM5_BASE, EPWM_GL_REGISTER_AQCTLA_AQCTLA2);	
-    EPWM_setActionQualifierAction(myEPWM5_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_ZERO);	
-    EPWM_setActionQualifierAction(myEPWM5_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_PERIOD);	
-    EPWM_setActionQualifierAction(myEPWM5_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPA);	
-    EPWM_setActionQualifierAction(myEPWM5_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPA);	
-    EPWM_setActionQualifierAction(myEPWM5_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPB);	
-    EPWM_setActionQualifierAction(myEPWM5_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPB);	
-    EPWM_enableGlobalLoadRegisters(myEPWM5_BASE, EPWM_GL_REGISTER_AQCTLB_AQCTLB2);	
-    EPWM_setActionQualifierAction(myEPWM5_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_ZERO);	
-    EPWM_setActionQualifierAction(myEPWM5_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_PERIOD);	
-    EPWM_setActionQualifierAction(myEPWM5_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPA);	
-    EPWM_setActionQualifierAction(myEPWM5_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPA);	
-    EPWM_setActionQualifierAction(myEPWM5_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPB);	
-    EPWM_setActionQualifierAction(myEPWM5_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPB);	
-    EPWM_setRisingEdgeDelayCountShadowLoadMode(myEPWM5_BASE, EPWM_RED_LOAD_ON_CNTR_ZERO);	
-    EPWM_disableRisingEdgeDelayCountShadowLoadMode(myEPWM5_BASE);	
-    EPWM_setFallingEdgeDelayCountShadowLoadMode(myEPWM5_BASE, EPWM_FED_LOAD_ON_CNTR_ZERO);	
-    EPWM_disableFallingEdgeDelayCountShadowLoadMode(myEPWM5_BASE);	
-    EPWM_enableInterrupt(myEPWM5_BASE);	
-    EPWM_setInterruptSource(myEPWM5_BASE, EPWM_INT_TBCTR_ZERO);	
-    EPWM_setInterruptEventCount(myEPWM5_BASE, 3);	
 }
 
 //*****************************************************************************
@@ -571,6 +527,7 @@ void GPIO_init(){
 	RDY_out_init();
 	ENA_out_init();
 	EN_in_init();
+	FAN_ctrl_out_init();
 }
 
 void CSIG2_in_init(){
@@ -589,6 +546,7 @@ void FLTN_in_init(){
 	GPIO_setDirectionMode(FLTN_in, GPIO_DIR_MODE_IN);
 }
 void ENB_out_init(){
+	GPIO_writePin(ENB_out, 0);
 	GPIO_setPadConfig(ENB_out, GPIO_PIN_TYPE_STD);
 	GPIO_setQualificationMode(ENB_out, GPIO_QUAL_SYNC);
 	GPIO_setDirectionMode(ENB_out, GPIO_DIR_MODE_OUT);
@@ -604,6 +562,7 @@ void RDY_out_init(){
 	GPIO_setDirectionMode(RDY_out, GPIO_DIR_MODE_OUT);
 }
 void ENA_out_init(){
+	GPIO_writePin(ENA_out, 0);
 	GPIO_setPadConfig(ENA_out, GPIO_PIN_TYPE_STD | GPIO_PIN_TYPE_PULLUP);
 	GPIO_setQualificationMode(ENA_out, GPIO_QUAL_SYNC);
 	GPIO_setDirectionMode(ENA_out, GPIO_DIR_MODE_OUT);
@@ -612,6 +571,12 @@ void EN_in_init(){
 	GPIO_setPadConfig(EN_in, GPIO_PIN_TYPE_STD | GPIO_PIN_TYPE_PULLUP);
 	GPIO_setQualificationMode(EN_in, GPIO_QUAL_SYNC);
 	GPIO_setDirectionMode(EN_in, GPIO_DIR_MODE_IN);
+}
+void FAN_ctrl_out_init(){
+	GPIO_writePin(FAN_ctrl_out, 1);
+	GPIO_setPadConfig(FAN_ctrl_out, GPIO_PIN_TYPE_STD);
+	GPIO_setQualificationMode(FAN_ctrl_out, GPIO_QUAL_SYNC);
+	GPIO_setDirectionMode(FAN_ctrl_out, GPIO_DIR_MODE_OUT);
 }
 
 //*****************************************************************************
