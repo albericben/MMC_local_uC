@@ -143,8 +143,8 @@ void PinMux_init()
 	GPIO_setPinConfig(GPIO_1_GPIO1);
 	// GPIO4 -> FLTN_in Pinmux
 	GPIO_setPinConfig(GPIO_4_GPIO4);
-	// GPIO16 -> ENB_out Pinmux
-	GPIO_setPinConfig(GPIO_16_GPIO16);
+	// GPIO6 -> ENB_out Pinmux
+	GPIO_setPinConfig(GPIO_6_GPIO6);
 	// GPIO12 -> GSYNC_in Pinmux
 	GPIO_setPinConfig(GPIO_12_GPIO12);
 	// GPIO24 -> RDY_out Pinmux
@@ -153,8 +153,8 @@ void PinMux_init()
 	GPIO_setPinConfig(GPIO_32_GPIO32);
 	// GPIO33 -> EN_in Pinmux
 	GPIO_setPinConfig(GPIO_33_GPIO33);
-	// GPIO30 -> FAN_ctrl_out Pinmux
-	GPIO_setPinConfig(GPIO_30_GPIO30);
+	// GPIO16 -> FAN_ctrl_out Pinmux
+	GPIO_setPinConfig(GPIO_16_GPIO16);
 
 }
 
@@ -206,12 +206,12 @@ void myADC0_init(){
 	//
 	// Configures a start-of-conversion (SOC) in the ADC and its interrupt SOC trigger.
 	// 	  	SOC number		: 0
-	//	  	Trigger			: ADC_TRIGGER_SW_ONLY
+	//	  	Trigger			: ADC_TRIGGER_EPWM7_SOCB
 	//	  	Channel			: ADC_CH_ADCIN0
 	//	 	Sample Window	: 8 SYSCLK cycles
 	//		Interrupt Trigger: ADC_INT_SOC_TRIGGER_NONE
 	//
-	ADC_setupSOC(myADC0_BASE, ADC_SOC_NUMBER0, ADC_TRIGGER_SW_ONLY, ADC_CH_ADCIN0, 8U);
+	ADC_setupSOC(myADC0_BASE, ADC_SOC_NUMBER0, ADC_TRIGGER_EPWM7_SOCB, ADC_CH_ADCIN0, 8U);
 	ADC_setInterruptSOCTrigger(myADC0_BASE, ADC_SOC_NUMBER0, ADC_INT_SOC_TRIGGER_NONE);
 	//
 	// Start of Conversion 1 Configuration
@@ -219,12 +219,12 @@ void myADC0_init(){
 	//
 	// Configures a start-of-conversion (SOC) in the ADC and its interrupt SOC trigger.
 	// 	  	SOC number		: 1
-	//	  	Trigger			: ADC_TRIGGER_SW_ONLY
+	//	  	Trigger			: ADC_TRIGGER_EPWM7_SOCB
 	//	  	Channel			: ADC_CH_ADCIN1
 	//	 	Sample Window	: 8 SYSCLK cycles
 	//		Interrupt Trigger: ADC_INT_SOC_TRIGGER_NONE
 	//
-	ADC_setupSOC(myADC0_BASE, ADC_SOC_NUMBER1, ADC_TRIGGER_SW_ONLY, ADC_CH_ADCIN1, 8U);
+	ADC_setupSOC(myADC0_BASE, ADC_SOC_NUMBER1, ADC_TRIGGER_EPWM7_SOCB, ADC_CH_ADCIN1, 8U);
 	ADC_setInterruptSOCTrigger(myADC0_BASE, ADC_SOC_NUMBER1, ADC_INT_SOC_TRIGGER_NONE);
 	//
 	// Start of Conversion 2 Configuration
@@ -258,12 +258,12 @@ void myADC0_init(){
 	//
 	// Configures a start-of-conversion (SOC) in the ADC and its interrupt SOC trigger.
 	// 	  	SOC number		: 5
-	//	  	Trigger			: ADC_TRIGGER_SW_ONLY
+	//	  	Trigger			: ADC_TRIGGER_EPWM7_SOCB
 	//	  	Channel			: ADC_CH_ADCIN5
 	//	 	Sample Window	: 8 SYSCLK cycles
 	//		Interrupt Trigger: ADC_INT_SOC_TRIGGER_NONE
 	//
-	ADC_setupSOC(myADC0_BASE, ADC_SOC_NUMBER5, ADC_TRIGGER_SW_ONLY, ADC_CH_ADCIN5, 8U);
+	ADC_setupSOC(myADC0_BASE, ADC_SOC_NUMBER5, ADC_TRIGGER_EPWM7_SOCB, ADC_CH_ADCIN5, 8U);
 	ADC_setInterruptSOCTrigger(myADC0_BASE, ADC_SOC_NUMBER5, ADC_INT_SOC_TRIGGER_NONE);
 	//
 	// Start of Conversion 7 Configuration
@@ -417,7 +417,7 @@ void CPUTIMER_init(){
 void myCPUTIMER0_init(){
 	CPUTimer_setEmulationMode(myCPUTIMER0_BASE, CPUTIMER_EMULATIONMODE_STOPAFTERNEXTDECREMENT);
 	CPUTimer_setPreScaler(myCPUTIMER0_BASE, 0U);
-	CPUTimer_setPeriod(myCPUTIMER0_BASE, 10000U);
+	CPUTimer_setPeriod(myCPUTIMER0_BASE, 10000000U);
 	CPUTimer_enableInterrupt(myCPUTIMER0_BASE);
 	CPUTimer_stopTimer(myCPUTIMER0_BASE);
 
@@ -432,7 +432,7 @@ void myCPUTIMER0_init(){
 //*****************************************************************************
 void EPWM_init(){
     EPWM_setClockPrescaler(myEPWM4_BASE, EPWM_CLOCK_DIVIDER_1, EPWM_HSCLOCK_DIVIDER_1);	
-    EPWM_setTimeBasePeriod(myEPWM4_BASE, 10000);	
+    EPWM_setTimeBasePeriod(myEPWM4_BASE, 20000);	
     EPWM_enableGlobalLoadRegisters(myEPWM4_BASE, EPWM_GL_REGISTER_TBPRD_TBPRDHR);	
     EPWM_setTimeBaseCounter(myEPWM4_BASE, 0);	
     EPWM_setTimeBaseCounterMode(myEPWM4_BASE, EPWM_COUNTER_MODE_UP);	
@@ -472,7 +472,7 @@ void EPWM_init(){
     EPWM_setInterruptSource(myEPWM4_BASE, EPWM_INT_TBCTR_ZERO);	
     EPWM_setInterruptEventCount(myEPWM4_BASE, 3);	
     EPWM_setClockPrescaler(myEPWM3_BASE, EPWM_CLOCK_DIVIDER_1, EPWM_HSCLOCK_DIVIDER_1);	
-    EPWM_setTimeBasePeriod(myEPWM3_BASE, 8000);	
+    EPWM_setTimeBasePeriod(myEPWM3_BASE, 20000);	
     EPWM_enableGlobalLoadRegisters(myEPWM3_BASE, EPWM_GL_REGISTER_TBPRD_TBPRDHR);	
     EPWM_setTimeBaseCounter(myEPWM3_BASE, 0);	
     EPWM_setTimeBaseCounterMode(myEPWM3_BASE, EPWM_COUNTER_MODE_UP);	

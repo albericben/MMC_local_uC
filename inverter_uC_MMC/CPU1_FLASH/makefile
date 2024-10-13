@@ -15,7 +15,7 @@ ORDERED_OBJS += \
 "./syscfg/c2000ware_libraries.obj" \
 "./device/device.obj" \
 "./device/f28002x_codestartbranch.obj" \
-"../280023_FLASH_lnk.cmd" \
+"../280025_RAM_lnk.cmd" \
 "C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib" \
 $(GEN_CMDS__FLAG) \
 -lc2000ware_libraries.cmd.genlibs \

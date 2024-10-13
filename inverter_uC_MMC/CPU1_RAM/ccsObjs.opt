@@ -1,12 +1,9 @@
-"./inverter_basic.obj"
+"./inverter_uC_MMC.obj"
 "./syscfg/board.obj"
 "./syscfg/c2000ware_libraries.obj"
-"./inverter_uC_MMC.obj"
 "./device/device.obj"
 "./device/f28002x_codestartbranch.obj"
-"../280023_RAM_lnk.cmd"
-"../28002x_generic_flash_lnk.cmd"
-"../28002x_generic_ram_lnk.cmd"
+"../280025_RAM_lnk.cmd"
 "C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib"
 -lc2000ware_libraries.cmd.genlibs
 -llibc.a

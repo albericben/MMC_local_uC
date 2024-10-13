@@ -1,58 +1,3 @@
-//#############################################################################
-//
-// FILE:   epwm_ex2_updown_aq.c
-//
-// TITLE:  ePWM Action Qualifier Module - Using up/down count.
-//
-//! \addtogroup driver_example_list
-//! <h1> ePWM Up Down Count Action Qualifier</h1>
-//!
-//! This example configures ePWM1, ePWM2, ePWM3 to produce a waveform with
-//! independent modulation on ePWMxA and ePWMxB.
-//!
-//! The compare values CMPA and CMPB are modified within the ePWM's ISR.
-//!
-//! The TB counter is in up/down count mode for this example.
-//!
-//! View the ePWM1A/B(GPIO0 & GPIO1), ePWM2A/B(GPIO2 &GPIO3)
-//! and ePWM3A/B(GPIO4 & GPIO5) waveforms on oscilloscope.
-//
-//#############################################################################
-//
-//
-// $Copyright:
-// Copyright (C) 2023 Texas Instruments Incorporated - http://www.ti.com/
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions 
-// are met:
-// 
-//   Redistributions of source code must retain the above copyright 
-//   notice, this list of conditions and the following disclaimer.
-// 
-//   Redistributions in binary form must reproduce the above copyright
-//   notice, this list of conditions and the following disclaimer in the 
-//   documentation and/or other materials provided with the   
-//   distribution.
-// 
-//   Neither the name of Texas Instruments Incorporated nor the names of
-//   its contributors may be used to endorse or promote products derived
-//   from this software without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
-// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// $
-//#############################################################################
-
 //
 // Included Files
 //
@@ -128,35 +73,22 @@ void main(void)
 {
     uint8_t tx_can_msg = 0;
 
-    // Initialize device clock and peripherals
     Device_init();
-
-    // Disable pin locks and enable internal pull ups.
     Device_initGPIO();
 
-    // Initialize PIE and clear PIE registers. Disables CPU interrupts.
     Interrupt_initModule();
-
-    // Initialize the PIE vector table with pointers to the shell Interrupt
-    // Service Routines (ISR).
     Interrupt_initVectorTable();
+    Interrupt_register(INT_EPWM3, &epwm2ISR);
+    Interrupt_register(INT_EPWM4, &epwm3ISR);
 
     txMsgData[0] = 0x12;
     txMsgData[1] = 0x34;
     txMsgData[2] = 0x56;
     txMsgData[3] = 0x78;
 
-    // Assign the interrupt service routines to ePWM interrupts
-    Interrupt_register(INT_EPWM3, &epwm2ISR);
-    Interrupt_register(INT_EPWM4, &epwm3ISR);
-
-
     // Disable sync(Freeze clock to PWM as well)
     SysCtl_disablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
 
-    // Configure GPIO0/1 , GPIO2/3 and GPIO4/5 as ePWM1A/1B, ePWM2A/2B and
-    // ePWM3A/3B pins respectively
-    // Configure EPWM Modules
     Board_init();
 
     initEPWM();
@@ -247,26 +179,13 @@ void initEPWM(void)
     EPWM_setADCTriggerSource(EPWM7_BASE, EPWM_SOC_B, EPWM_SOC_TBCTR_U_CMPB);
     EPWM_setADCTriggerEventPrescale(EPWM7_BASE, EPWM_SOC_B, 1);
 
-    //
-    // Set the compare B value to 1000 and the period to 1999
-    // Assuming ePWM clock is 100MHz, this would give 50kHz sampling
-    // 50MHz ePWM clock would give 25kHz sampling, etc.
-    // The sample rate can also be modulated by changing the ePWM period
-    // directly (ensure that the compare A value is less than the period).
-    //
     EPWM_setCounterCompareValue(EPWM7_BASE, EPWM_COUNTER_COMPARE_B, 6000);
     EPWM_setTimeBasePeriod(EPWM7_BASE, 11999);
 
-    //
-    // Set the local ePWM module clock divider to /1
-    //
     EPWM_setClockPrescaler(EPWM7_BASE,
                            EPWM_CLOCK_DIVIDER_1,
                            EPWM_HSCLOCK_DIVIDER_1);
 
-    //
-    // Freeze the counter
-    //
     EPWM_setTimeBaseCounterMode(EPWM7_BASE, EPWM_COUNTER_MODE_STOP_FREEZE);
 }
 
@@ -275,11 +194,6 @@ void initEPWM(void)
 //
 void initEPWM2()
 {
-    //
-    // Information this example uses to keep track of the direction the
-    // CMPA/CMPB values are moving, the min and max allowed values and
-    // a pointer to the correct ePWM registers
-    //
     epwm2Info.epwmCompADirection = EPWM_CMP_UP;
     epwm2Info.epwmCompBDirection = EPWM_CMP_UP;
     epwm2Info.epwmTimerIntCount = 0U;
@@ -293,11 +207,6 @@ void initEPWM2()
 //
 void initEPWM3(void)
 {
-    //
-    // Information this example uses to keep track of the direction the
-    // CMPA/CMPB values are moving, the min and max allowed values and
-    // a pointer to the correct ePWM registers
-    //
     epwm3Info.epwmCompADirection = EPWM_CMP_UP;
     epwm3Info.epwmCompBDirection = EPWM_CMP_DOWN;
     epwm3Info.epwmTimerIntCount = 0U;
@@ -421,8 +330,7 @@ __interrupt void gbl_enbl_ISR(void)
 //
 __interrupt void epwm2ISR(void)
 {
-    // Update the CMPA and CMPB values
-    updateCompare(&epwm2Info);
+    // Controller code to update PWM
 
     // Clear INT flag for this timer
     EPWM_clearEventTriggerInterruptFlag(myEPWM3_BASE);
@@ -436,8 +344,7 @@ __interrupt void epwm2ISR(void)
 //
 __interrupt void epwm3ISR(void)
 {
-    // Update the CMPA and CMPB values
-    updateCompare(&epwm3Info);
+    // Controller code to update PWM
 
     // Clear INT flag for this timer
     EPWM_clearEventTriggerInterruptFlag(myEPWM4_BASE);

@@ -144,7 +144,6 @@ void main(void)
     initEPWM3();
 
     GPIO_setDirectionMode(ENA_out, GPIO_DIR_MODE_OUT);
-    GPIO_writePin(ENA_out, 1);
 
     // Enable sync and clock to PWM
     SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
@@ -204,8 +203,8 @@ void initEPWM3(void)
 __interrupt void gbl_flt_ISR(void)
 {
     // Write code to handle fault - STOP ALL GATE signaling
-    GPIO_writePin(ENA_out, 0);
-    GPIO_writePin(ENB_out, 0);
+//    GPIO_writePin(ENA_out, 0);
+//    GPIO_writePin(ENB_out, 0);
 
     // Acknowledge the interrupt
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);

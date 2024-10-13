@@ -6,7 +6,7 @@ SHELL = cmd.exe
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CMD_SRCS += \
-../280023_FLASH_lnk.cmd 
+../280025_RAM_lnk.cmd 
 
 SYSCFG_SRCS += \
 ../inverter_uC_MMC.syscfg 
