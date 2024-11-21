@@ -71,7 +71,7 @@ void updateCompare(epwmInformation *epwmInfo);
 //
 void main(void)
 {
-    uint8_t tx_can_msg = 0;
+    uint8_t tx_can_msg = 1;
 
     Device_init();
     Device_initGPIO();
@@ -128,7 +128,10 @@ void main(void)
             //
             CAN_sendMessage(CANA_BASE, 1, 4, txMsgData);
 
-            while(txMsgSuccessful == 1);
+            while(1)
+            {
+                if (txMsgSuccessful == 0) break;
+            }
 
             txMsgData[0] += 0x01;
             txMsgData[1] += 0x01;

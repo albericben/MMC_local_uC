@@ -15,10 +15,17 @@
 #define EPWM_CMP_UP           1U
 #define EPWM_CMP_DOWN         0U
 
-#define OVER_TEMP_THRESH   0x07FF
-#define TEMP_HYST_THRESH   OVER_TEMP_THRESH-0x00FF
+#define OVER_TEMP_THRESH   0x0AFF
+#define FAN_START_TEMP_THRESH   0x07FF
+#define TEMP_HYST_THRESH   FAN_START_TEMP_THRESH-0x00FF
 
 #define FAN_ON_OFF_THRESH  0x07FF
+
+#define HIGH    1U
+#define LOW     0U
+
+#define FAN_ON      0U
+#define FAN_OFF     1U
 
 typedef struct
 {
@@ -49,11 +56,20 @@ void initEPWM();        // ADC Read Trigger
 void initEPWM2(void);   // SIG A
 void initEPWM3(void);   // SIG B
 
-uint8_t over_temp_thresh = 0;
-
 volatile uint16_t errorFlag = 0;
 uint8_t txMsgSuccessful  = 1;
 uint16_t txMsgData[4];
+
+uint8_t fan_sensor = 0;
+
+enum fan_state {
+  FAN_START = 0,
+  FAN_WAITING,
+  FAN_RUNNING,
+  FAN_FAULTED
+};
+
+enum fan_state fanState = FAN_START;
 
 __interrupt void adcA1ISR(void);
 __interrupt void epwm2ISR(void);
@@ -110,13 +126,17 @@ void main(void)
     EPWM_enableADCTrigger(EPWM7_BASE, EPWM_SOC_B);
     EPWM_setTimeBaseCounterMode(EPWM7_BASE, EPWM_COUNTER_MODE_UP);
 
+    // Enable start
+    GPIO_writePin(ENA_out, HIGH);
+    GPIO_writePin(ENB_out, HIGH);
+
     // IDLE loop. Just sit and loop forever (optional):
     for(;;)
     {
         if(errorFlag)
         {
-            GPIO_writePin(ENA_out, 0);
-            GPIO_writePin(ENB_out, 0);
+            GPIO_writePin(ENA_out, LOW);
+            GPIO_writePin(ENB_out, LOW);
             asm("   ESTOP0");
         }
 
@@ -225,42 +245,45 @@ __interrupt void fanctrlISR(void)
     adc_raw_ntc2 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER1);   // NTC2
     adc_raw_fans = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER5);   // FAN_SENS
 
-    if (adc_raw_ntc1 >= OVER_TEMP_THRESH && adc_raw_ntc2 >= OVER_TEMP_THRESH && over_temp_thresh == 0)
+    switch (fanState)
     {
-        over_temp_thresh = 1;
-        GPIO_writePin(FAN_ctrl_out, 0); // turn on fan
-    }
-    else if (over_temp_thresh == 1)
-    {
-        if (adc_raw_ntc1 >= TEMP_HYST_THRESH && adc_raw_ntc2 >= TEMP_HYST_THRESH)
-        {
-            if (adc_raw_fans < FAN_ON_OFF_THRESH)
-            {
-                GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
-                GPIO_writePin(ENA_out, 0);
-                GPIO_writePin(ENB_out, 0);
-                // TO DO: Write (CAN TX) fan fault message high
-            }
-            // Leave fan on
-        }
-        else
-        {
-            over_temp_thresh = 0;
-            GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
-        }
-    }
-    else
-    {
-        if (adc_raw_fans >= FAN_ON_OFF_THRESH)
-        {
-            GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
-            GPIO_writePin(ENA_out, 0);
-            GPIO_writePin(ENB_out, 0);
-            // TO DO: Write (CAN TX) fan fault message high when was meant to be low
-        }
-    }
+    case FAN_START:
+        GPIO_writePin(FAN_ctrl_out, FAN_OFF); // turn off fan
+        fanState = FAN_WAITING;
+        break;
 
-//    GPIO_togglePin(FAN_ctrl_out);
+    case FAN_WAITING:
+        if (adc_raw_fans > FAN_ON_OFF_THRESH && fan_sensor == 1)
+        {
+            fanState = FAN_FAULTED;
+        }
+        else if (adc_raw_ntc1 >= FAN_START_TEMP_THRESH && adc_raw_ntc2 >= FAN_START_TEMP_THRESH)
+        {
+            fanState = FAN_RUNNING;
+            GPIO_writePin(FAN_ctrl_out, FAN_ON); // turn on fan
+        }
+        break;
+
+    case FAN_RUNNING:
+        if (adc_raw_fans < FAN_ON_OFF_THRESH && fan_sensor == 1)
+        {
+            fanState = FAN_FAULTED;
+        }
+        else if (adc_raw_ntc1 >= OVER_TEMP_THRESH && adc_raw_ntc2 >= OVER_TEMP_THRESH)
+        {
+            fanState = FAN_FAULTED;
+        }
+        if (adc_raw_ntc1 < TEMP_HYST_THRESH && adc_raw_ntc2 < TEMP_HYST_THRESH)
+        {
+            fanState = FAN_START;
+        }
+        break;
+
+    case FAN_FAULTED:
+        GPIO_writePin(FAN_ctrl_out, FAN_OFF); // turn off fan
+        // TO DO: Limit fan output current to 2 A and send fan failure message over CAN
+        break;
+    }
 
     //
     // Acknowledge this interrupt to receive more interrupts from group 1
@@ -306,8 +329,8 @@ __interrupt void adcA1ISR(void)
 __interrupt void gbl_flt_ISR(void)
 {
     // Write code to handle fault - STOP ALL GATE signaling
-    GPIO_writePin(ENA_out, 0);
-    GPIO_writePin(ENB_out, 0);
+    GPIO_writePin(ENA_out, LOW);
+    GPIO_writePin(ENB_out, LOW);
 
     // Acknowledge the interrupt
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
