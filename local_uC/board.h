@@ -197,13 +197,13 @@ void myADC0_init();
 
 //*****************************************************************************
 //
-// CAN Configurations
+// CAN Configurations - 357913941
 //
 //*****************************************************************************
 #define myCAN0_BASE CANA_BASE
 
-#define myCAN0_MessageObj1_ID 357913941
-#define myCAN0_MessageObj2_ID 357913941
+#define myCAN0_MessageObj1_ID 0
+#define myCAN0_MessageObj2_ID 0
 void myCAN0_init();
 
 

@@ -126,7 +126,7 @@ void main(void)
             //
             // Transmit the message.
             //
-            CAN_sendMessage(CANA_BASE, 1, 4, txMsgData);
+             CAN_sendMessage(CANA_BASE, 1, 4, txMsgData);
 
             while(1)
             {

@@ -368,7 +368,7 @@ void myCAN0_init(){
     // tighter timing control. Additionally, consult the device data sheet
     // for more information about the CAN module clocking.
     //
-    CAN_setBitTiming(myCAN0_BASE, 7, 0, 15, 7, 3);
+    CAN_setBitTiming(myCAN0_BASE, 39, 0, 15, 7, 3);
     //
     // Enable CAN Interrupts
     //
@@ -385,7 +385,7 @@ void myCAN0_init(){
     //      Message Object Flags: CAN_MSG_OBJ_TX_INT_ENABLE
     //      Message Data Length: 4 Bytes
     //
-    CAN_setupMessageObject(myCAN0_BASE, 1, myCAN0_MessageObj1_ID, CAN_MSG_FRAME_EXT,CAN_MSG_OBJ_TYPE_TX, 0, CAN_MSG_OBJ_TX_INT_ENABLE,4);
+    CAN_setupMessageObject(myCAN0_BASE, 1, myCAN0_MessageObj1_ID, CAN_MSG_FRAME_STD,CAN_MSG_OBJ_TYPE_TX, 0, CAN_MSG_OBJ_TX_INT_ENABLE,4);
     //
     // Initialize the transmit message object used for sending CAN messages.
     // Message Object Parameters:
@@ -397,7 +397,7 @@ void myCAN0_init(){
     //      Message Object Flags: CAN_MSG_OBJ_RX_INT_ENABLE
     //      Message Data Length: 0 Bytes
     //
-    CAN_setupMessageObject(myCAN0_BASE, 2, myCAN0_MessageObj2_ID, CAN_MSG_FRAME_EXT,CAN_MSG_OBJ_TYPE_RX, 0, CAN_MSG_OBJ_RX_INT_ENABLE,0);
+    CAN_setupMessageObject(myCAN0_BASE, 2, myCAN0_MessageObj2_ID, CAN_MSG_FRAME_STD,CAN_MSG_OBJ_TYPE_RX, 0, CAN_MSG_OBJ_RX_INT_ENABLE,0);
     CAN_setInterruptMux(myCAN0_BASE, 0);
     //
     // Start CAN module operations

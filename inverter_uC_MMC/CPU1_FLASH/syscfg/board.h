@@ -57,6 +57,11 @@ extern "C"
 // PinMux Configurations
 //
 //*****************************************************************************
+//
+// AIO244 - GPIO Settings
+//
+#define GPIO_PIN_AIO244 244
+#define TACH_in_AIO_PIN_CONFIG GPIO_244_GPIO244
 
 //
 // ANALOG -> myANALOGPinMux0 Pinmux
@@ -97,6 +102,16 @@ extern "C"
 #define GPIO_PIN_EPWM3_B 5
 #define myEPWM3_EPWMB_GPIO 5
 #define myEPWM3_EPWMB_PIN_CONFIG GPIO_5_EPWM3_B
+
+//
+// EPWM5 -> fanPWM Pinmux
+//
+//
+// EPWM5_A - GPIO Settings
+//
+#define GPIO_PIN_EPWM5_A 16
+#define fanPWM_EPWMA_GPIO 16
+#define fanPWM_EPWMA_PIN_CONFIG GPIO_16_EPWM5_A
 //
 // GPIO0 - GPIO Settings
 //
@@ -129,10 +144,6 @@ extern "C"
 // GPIO33 - GPIO Settings
 //
 #define EN_in_GPIO_PIN_CONFIG GPIO_33_GPIO33
-//
-// GPIO16 - GPIO Settings
-//
-#define FAN_ctrl_out_GPIO_PIN_CONFIG GPIO_16_GPIO16
 
 //*****************************************************************************
 //
@@ -161,11 +172,6 @@ extern "C"
 #define myADC0_SAMPLE_WINDOW_SOC3 80
 #define myADC0_TRIGGER_SOURCE_SOC3 ADC_TRIGGER_EPWM7_SOCB
 #define myADC0_CHANNEL_SOC3 ADC_CH_ADCIN3
-#define myADC0_SOC5 ADC_SOC_NUMBER5
-#define myADC0_FORCE_SOC5 ADC_FORCE_SOC5
-#define myADC0_SAMPLE_WINDOW_SOC5 80
-#define myADC0_TRIGGER_SOURCE_SOC5 ADC_TRIGGER_EPWM7_SOCB
-#define myADC0_CHANNEL_SOC5 ADC_CH_ADCIN5
 #define myADC0_SOC7 ADC_SOC_NUMBER7
 #define myADC0_FORCE_SOC7 ADC_FORCE_SOC7
 #define myADC0_SAMPLE_WINDOW_SOC7 80
@@ -191,6 +197,14 @@ void myADC0_init();
 
 //*****************************************************************************
 //
+// AIO Configurations
+//
+//*****************************************************************************
+#define TACH_in 244
+void TACH_in_init();
+
+//*****************************************************************************
+//
 // ASYSCTL Configurations
 //
 //*****************************************************************************
@@ -202,8 +216,8 @@ void myADC0_init();
 //*****************************************************************************
 #define myCAN0_BASE CANA_BASE
 
-#define myCAN0_MessageObj1_ID 357913941
-#define myCAN0_MessageObj2_ID 357913941
+#define myCAN0_MessageObj1_ID 0
+#define myCAN0_MessageObj2_ID 0
 void myCAN0_init();
 
 
@@ -214,6 +228,8 @@ void myCAN0_init();
 //*****************************************************************************
 #define myCPUTIMER0_BASE CPUTIMER0_BASE
 void myCPUTIMER0_init();
+#define myCPUTIMER1_BASE CPUTIMER1_BASE
+void myCPUTIMER1_init();
 
 //*****************************************************************************
 //
@@ -246,6 +262,19 @@ void myCPUTIMER0_init();
 #define myEPWM3_TZA_ACTION EPWM_TZ_ACTION_HIGH_Z
 #define myEPWM3_TZB_ACTION EPWM_TZ_ACTION_HIGH_Z
 #define myEPWM3_INTERRUPT_SOURCE EPWM_INT_TBCTR_ZERO
+#define fanPWM_BASE EPWM5_BASE
+#define fanPWM_TBPRD 2000
+#define fanPWM_COUNTER_MODE EPWM_COUNTER_MODE_UP
+#define fanPWM_TBPHS 0
+#define fanPWM_CMPA 1000
+#define fanPWM_CMPB 0
+#define fanPWM_CMPC 0
+#define fanPWM_CMPD 0
+#define fanPWM_DBRED 0
+#define fanPWM_DBFED 0
+#define fanPWM_TZA_ACTION EPWM_TZ_ACTION_HIGH_Z
+#define fanPWM_TZB_ACTION EPWM_TZ_ACTION_HIGH_Z
+#define fanPWM_INTERRUPT_SOURCE EPWM_INT_TBCTR_ZERO
 
 //*****************************************************************************
 //
@@ -268,8 +297,6 @@ void RDY_out_init();
 void ENA_out_init();
 #define EN_in 33
 void EN_in_init();
-#define FAN_ctrl_out 16
-void FAN_ctrl_out_init();
 
 //*****************************************************************************
 //
@@ -309,6 +336,10 @@ extern __interrupt void myCAN0_1_ISR(void);
 #define INT_myCPUTIMER0_INTERRUPT_ACK_GROUP INTERRUPT_ACK_GROUP1
 extern __interrupt void fanctrlISR(void);
 
+// Interrupt Settings for INT_myCPUTIMER1
+#define INT_myCPUTIMER1 INT_TIMER1
+extern __interrupt void fanreadISR(void);
+
 // Interrupt Settings for INT_FLTN_in_XINT
 #define INT_FLTN_in_XINT INT_XINT1
 #define INT_FLTN_in_XINT_INTERRUPT_ACK_GROUP INTERRUPT_ACK_GROUP1
@@ -344,6 +375,7 @@ void EN_in_XINT_init();
 //*****************************************************************************
 void	Board_init();
 void	ADC_init();
+void	AIO_init();
 void	ASYSCTL_init();
 void	CAN_init();
 void	CPUTIMER_init();

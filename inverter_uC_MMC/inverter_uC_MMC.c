@@ -16,7 +16,7 @@
 #define EPWM_CMP_DOWN         0U
 
 #define OVER_TEMP_THRESH   0x0AFF
-#define FAN_START_TEMP_THRESH   0x07FF
+#define FAN_START_TEMP_THRESH   0x08FF
 #define TEMP_HYST_THRESH   FAN_START_TEMP_THRESH-0x00FF
 
 #define FAN_ON_OFF_THRESH  0x07FF
@@ -41,16 +41,21 @@ typedef struct
 
 epwmInformation epwm2Info;
 epwmInformation epwm3Info;
+epwmInformation epwmfanInfo;
 
 uint16_t adc_raw_ntc1;   // NTC1 PIN
 uint16_t adc_raw_ntc2;   // NTC2 PIN
 uint16_t adc_raw_iac1;   // G1_CUR PIN
 uint16_t adc_raw_iac2;   // G2_CUR PIN
-uint16_t adc_raw_fans;   // FAN_SENS PIN
 uint16_t adc_raw_vdc1;   // DC1_LNK PIN
 uint16_t adc_raw_vdc2;  // DC2_LNK PIN
 uint16_t adc_raw_vac1;  // G1_VLT PIN
 uint16_t adc_raw_vac2;  // G2_VLT PIN
+
+uint16_t target_fan_duty = 0;
+uint16_t fan_duty = 0;
+
+volatile uint16_t capCount;
 
 void initEPWM();        // ADC Read Trigger
 void initEPWM2(void);   // SIG A
@@ -60,7 +65,10 @@ volatile uint16_t errorFlag = 0;
 uint8_t txMsgSuccessful  = 1;
 uint16_t txMsgData[4];
 
-uint8_t fan_sensor = 0;
+volatile uint8_t fan_sensor = 0;
+volatile uint16_t tach_count;
+volatile uint8_t prev_tach_read;
+volatile uint8_t fan_started = 0;
 
 enum fan_state {
   FAN_START = 0,
@@ -74,9 +82,11 @@ enum fan_state fanState = FAN_START;
 __interrupt void adcA1ISR(void);
 __interrupt void epwm2ISR(void);
 __interrupt void epwm3ISR(void);
+__interrupt void fanISR(void);
 __interrupt void gbl_flt_ISR(void);
 __interrupt void gbl_enbl_ISR(void);
 __interrupt void fanctrlISR(void);
+__interrupt void fanreadISR(void);
 __interrupt void myCAN0_0_ISR(void);
 __interrupt void myCAN0_1_ISR(void);
 
@@ -87,7 +97,7 @@ void updateCompare(epwmInformation *epwmInfo);
 //
 void main(void)
 {
-    uint8_t tx_can_msg = 0;
+    uint8_t tx_can_msg = 1;
 
     Device_init();
     Device_initGPIO();
@@ -96,6 +106,7 @@ void main(void)
     Interrupt_initVectorTable();
     Interrupt_register(INT_EPWM3, &epwm2ISR);
     Interrupt_register(INT_EPWM4, &epwm3ISR);
+    Interrupt_register(INT_EPWM5, &fanISR);
 
     txMsgData[0] = 0x12;
     txMsgData[1] = 0x34;
@@ -117,8 +128,9 @@ void main(void)
     // Enable ePWM interrupts
     Interrupt_enable(INT_EPWM3);
     Interrupt_enable(INT_EPWM4);
+    Interrupt_enable(INT_EPWM5);
 
-    // Enable Global Interrupt (INTM) and realtime interrupt (DBGM)
+    // Enable Global Interrupt (INTM) and real-time interrupt (DBGM)
     EINT;
     ERTM;
 
@@ -236,6 +248,19 @@ void initEPWM3(void)
 }
 
 //
+// initEPWM3 - Configure ePWM3
+//
+void initEPWMFAN(void)
+{
+    epwmfanInfo.epwmCompADirection = EPWM_CMP_UP;
+    epwmfanInfo.epwmCompBDirection = EPWM_CMP_DOWN;
+    epwmfanInfo.epwmTimerIntCount = 0U;
+    epwmfanInfo.epwmModule = fanPWM_BASE;
+    epwmfanInfo.epwmMaxCompB = EPWM3_MAX_CMPB;
+    epwmfanInfo.epwmMinCompB = EPWM3_MIN_CMPB;
+}
+
+//
 // cpuTimer0ISR - Counter for CpuTimer0
 //
 __interrupt void fanctrlISR(void)
@@ -243,29 +268,30 @@ __interrupt void fanctrlISR(void)
     // Low priority reads for fan control - could be moved to slower timer
     adc_raw_ntc1 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER0);   // NTC1
     adc_raw_ntc2 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER1);   // NTC2
-    adc_raw_fans = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER5);   // FAN_SENS
 
+    // Controller code to update PWM
     switch (fanState)
     {
     case FAN_START:
-        GPIO_writePin(FAN_ctrl_out, FAN_OFF); // turn off fan
+        target_fan_duty = 0;
         fanState = FAN_WAITING;
         break;
 
     case FAN_WAITING:
-        if (adc_raw_fans > FAN_ON_OFF_THRESH && fan_sensor == 1)
+        if (fan_started == 1 && fan_sensor == 1)
         {
             fanState = FAN_FAULTED;
         }
         else if (adc_raw_ntc1 >= FAN_START_TEMP_THRESH && adc_raw_ntc2 >= FAN_START_TEMP_THRESH)
         {
             fanState = FAN_RUNNING;
-            GPIO_writePin(FAN_ctrl_out, FAN_ON); // turn on fan
+            fan_duty = 500; // start at 25%
+            target_fan_duty = 1500;
         }
         break;
 
     case FAN_RUNNING:
-        if (adc_raw_fans < FAN_ON_OFF_THRESH && fan_sensor == 1)
+        if (fan_started == 0 && fan_sensor == 1)
         {
             fanState = FAN_FAULTED;
         }
@@ -280,10 +306,45 @@ __interrupt void fanctrlISR(void)
         break;
 
     case FAN_FAULTED:
-        GPIO_writePin(FAN_ctrl_out, FAN_OFF); // turn off fan
+        target_fan_duty = 0;
         // TO DO: Limit fan output current to 2 A and send fan failure message over CAN
         break;
     }
+
+    if (target_fan_duty > fan_duty)
+    {
+        fan_duty += 5;
+    }
+    else if (target_fan_duty < fan_duty)
+    {
+        fan_duty -= 5;
+    }
+
+    //
+    // Acknowledge this interrupt to receive more interrupts from group 1
+    //
+    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
+}
+
+//
+// cpuTimer0ISR - Counter for CpuTimer0
+//
+__interrupt void fanreadISR(void)
+{
+    uint8_t tach_read = GPIO_readPin(TACH_in);
+    if (tach_count > 2500)
+    {
+        tach_count = 0;
+        fan_started = 0;
+    }
+    else if (tach_read != prev_tach_read)
+    {
+        if (tach_count > 10) {fan_started = 1;}
+        tach_count = 0;
+    }
+
+    tach_count++;
+    prev_tach_read = tach_read;
 
     //
     // Acknowledge this interrupt to receive more interrupts from group 1
@@ -371,6 +432,20 @@ __interrupt void epwm3ISR(void)
 
     // Clear INT flag for this timer
     EPWM_clearEventTriggerInterruptFlag(myEPWM4_BASE);
+
+    // Acknowledge interrupt group
+    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP3);
+}
+
+//
+// fanISR - ePWM 5 ISR
+//
+__interrupt void fanISR(void)
+{
+    EPWM_setCounterCompareValue(fanPWM_BASE, EPWM_COUNTER_COMPARE_A, fan_duty);
+
+    // Clear INT flag for this timer
+    EPWM_clearEventTriggerInterruptFlag(fanPWM_BASE);
 
     // Acknowledge interrupt group
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP3);

@@ -7,7 +7,7 @@
 
 
 volatile uint16_t errorFlag = 0;
-volatile uint16_t intCount = 0;
+volatile uint32_t intCount = 0;
 
 __interrupt void adcA1ISR(void);
 __interrupt void gbl_flt_ISR(void);
@@ -41,7 +41,7 @@ void main(void)
     // IDLE loop. Just sit and loop forever (optional):
     for(;;)
     {
-
+        GPIO_writePin(ENA_out, 1);
         if(errorFlag)
         {
             GPIO_writePin(ENA_out, 0);
@@ -56,7 +56,7 @@ void main(void)
 //
 __interrupt void fanctrlISR(void)
 {
-    if (intCount == 10000)
+    if (intCount == 1000000)
     {
         intCount = 0;
         GPIO_writePin(SIGA_out, 1);
