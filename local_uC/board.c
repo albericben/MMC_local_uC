@@ -33,6 +33,11 @@
 
 #include "board.h"
 
+#define BOARD_NUM 0
+#define BOARD_NUM_OFFSET 0
+#define NUM_COMMS_BOARDS 8
+#define DC_BUS_PRIORITY 100
+
 //*****************************************************************************
 //
 // Board Configurations
@@ -362,42 +367,34 @@ void CAN_init(){
 }
 
 void myCAN0_init(){
+    uint32_t i, boardIdNum, messageObject;
     CAN_initModule(myCAN0_BASE);
     //
     // Refer to the Driver Library User Guide for information on how to set
     // tighter timing control. Additionally, consult the device data sheet
     // for more information about the CAN module clocking.
     //
-    CAN_setBitTiming(myCAN0_BASE, 39, 0, 15, 7, 3);
-    //
-    // Enable CAN Interrupts
-    //
-    CAN_enableInterrupt(myCAN0_BASE, CAN_INT_IE0);
+#if(BOARD_NUM == 0)
+    CAN_setBitTiming(myCAN0_BASE, 3, 0, 15, 7, 3);
+#else
+    CAN_setBitTiming(myCAN0_BASE, 0, 0, 10, 7, 3);
+#endif
+
+    CAN_enableInterrupt(myCAN0_BASE, CAN_INT_IE0|CAN_INT_STATUS);
     CAN_enableGlobalInterrupt(myCAN0_BASE, CAN_GLOBAL_INT_CANINT0);
-    //
-    // Initialize the transmit message object used for sending CAN messages.
-    // Message Object Parameters:
-    //      Message Object ID Number: 1
-    //      Message Identifier: 357913941
-    //      Message Frame: CAN_MSG_FRAME_EXT
-    //      Message Type: CAN_MSG_OBJ_TYPE_TX
-    //      Message ID Mask: 0
-    //      Message Object Flags: CAN_MSG_OBJ_TX_INT_ENABLE
-    //      Message Data Length: 4 Bytes
-    //
-    CAN_setupMessageObject(myCAN0_BASE, 1, myCAN0_MessageObj1_ID, CAN_MSG_FRAME_STD,CAN_MSG_OBJ_TYPE_TX, 0, CAN_MSG_OBJ_TX_INT_ENABLE,4);
-    //
-    // Initialize the transmit message object used for sending CAN messages.
-    // Message Object Parameters:
-    //      Message Object ID Number: 2
-    //      Message Identifier: 357913941
-    //      Message Frame: CAN_MSG_FRAME_EXT
-    //      Message Type: CAN_MSG_OBJ_TYPE_RX
-    //      Message ID Mask: 0
-    //      Message Object Flags: CAN_MSG_OBJ_RX_INT_ENABLE
-    //      Message Data Length: 0 Bytes
-    //
-    CAN_setupMessageObject(myCAN0_BASE, 2, myCAN0_MessageObj2_ID, CAN_MSG_FRAME_STD,CAN_MSG_OBJ_TYPE_RX, 0, CAN_MSG_OBJ_RX_INT_ENABLE,0);
+
+    boardIdNum = BOARD_NUM + BOARD_NUM_OFFSET + DC_BUS_PRIORITY;
+    messageObject = 1;
+
+    CAN_setupMessageObject(myCAN0_BASE, 1, boardIdNum, CAN_MSG_FRAME_STD,CAN_MSG_OBJ_TYPE_TX, 0, CAN_MSG_OBJ_TX_INT_ENABLE,4);
+
+    for (i = BOARD_NUM_OFFSET + DC_BUS_PRIORITY; i < NUM_COMMS_BOARDS; i++) {
+        messageObject++;
+        if (i != boardIdNum) {
+            CAN_setupMessageObject(myCAN0_BASE, messageObject, boardIdNum, CAN_MSG_FRAME_STD, CAN_MSG_OBJ_TYPE_RX, 0, CAN_MSG_OBJ_RX_INT_ENABLE,0);
+        }
+    }
+
     CAN_setInterruptMux(myCAN0_BASE, 0);
     //
     // Start CAN module operations
@@ -412,17 +409,29 @@ void myCAN0_init(){
 //*****************************************************************************
 void CPUTIMER_init(){
     myCPUTIMER0_init();
+    myCPUTIMER1_init();
 }
 
 void myCPUTIMER0_init(){
     CPUTimer_setEmulationMode(myCPUTIMER0_BASE, CPUTIMER_EMULATIONMODE_STOPAFTERNEXTDECREMENT);
     CPUTimer_setPreScaler(myCPUTIMER0_BASE, 0U);
-    CPUTimer_setPeriod(myCPUTIMER0_BASE, 10000000U);
+    CPUTimer_setPeriod(myCPUTIMER0_BASE, 100000000U);
     CPUTimer_enableInterrupt(myCPUTIMER0_BASE);
     CPUTimer_stopTimer(myCPUTIMER0_BASE);
 
     CPUTimer_reloadTimerCounter(myCPUTIMER0_BASE);
     CPUTimer_startTimer(myCPUTIMER0_BASE);
+}
+
+void myCPUTIMER1_init(){
+    CPUTimer_setEmulationMode(myCPUTIMER1_BASE, CPUTIMER_EMULATIONMODE_STOPAFTERNEXTDECREMENT);
+    CPUTimer_setPreScaler(myCPUTIMER1_BASE, 0U);
+    CPUTimer_setPeriod(myCPUTIMER1_BASE, 10000000U);
+    CPUTimer_enableInterrupt(myCPUTIMER1_BASE);
+    CPUTimer_stopTimer(myCPUTIMER1_BASE);
+
+    CPUTimer_reloadTimerCounter(myCPUTIMER1_BASE);
+    CPUTimer_startTimer(myCPUTIMER1_BASE);
 }
 
 //*****************************************************************************
@@ -618,6 +627,10 @@ void INTERRUPT_init(){
     // Interrupt Setings for INT_myCPUTIMER0
     Interrupt_register(INT_myCPUTIMER0, &fanctrlISR);
     Interrupt_enable(INT_myCPUTIMER0);
+
+    // Interrupt Setings for INT_myCPUTIMER0
+    Interrupt_register(INT_myCPUTIMER1, &canSendISR);
+    Interrupt_enable(INT_myCPUTIMER1);
 
     // Interrupt Setings for INT_FLTN_in_XINT
     Interrupt_register(INT_FLTN_in_XINT, &gbl_flt_ISR);

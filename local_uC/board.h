@@ -215,6 +215,9 @@ void myCAN0_init();
 #define myCPUTIMER0_BASE CPUTIMER0_BASE
 void myCPUTIMER0_init();
 
+#define myCPUTIMER1_BASE CPUTIMER1_BASE
+void myCPUTIMER1_init();
+
 //*****************************************************************************
 //
 // EPWM Configurations
@@ -308,6 +311,11 @@ extern __interrupt void myCAN0_1_ISR(void);
 #define INT_myCPUTIMER0 INT_TIMER0
 #define INT_myCPUTIMER0_INTERRUPT_ACK_GROUP INTERRUPT_ACK_GROUP1
 extern __interrupt void fanctrlISR(void);
+
+// Interrupt Settings for INT_myCPUTIMER0
+#define INT_myCPUTIMER1 INT_TIMER1
+#define INT_myCPUTIMER1_INTERRUPT_ACK_GROUP INTERRUPT_ACK_GROUP1
+extern __interrupt void canSendISR(void);
 
 // Interrupt Settings for INT_FLTN_in_XINT
 #define INT_FLTN_in_XINT INT_XINT1

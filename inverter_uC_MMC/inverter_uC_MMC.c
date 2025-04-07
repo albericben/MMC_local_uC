@@ -353,6 +353,32 @@ __interrupt void fanreadISR(void)
 }
 
 //
+// cpuTimer1ISR - Counter for CpuTimer1
+//
+__interrupt void fanreadISR(void)
+{
+    uint8_t tach_read = GPIO_readPin(TACH_in);
+    if (tach_count > 2500)
+    {
+        tach_count = 0;
+        fan_started = 0;
+    }
+    else if (tach_read != prev_tach_read)
+    {
+        if (tach_count > 10) {fan_started = 1;}
+        tach_count = 0;
+    }
+
+    tach_count++;
+    prev_tach_read = tach_read;
+
+    //
+    // Acknowledge this interrupt to receive more interrupts from group 1
+    //
+    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
+}
+
+//
 // ADC A Interrupt 1 ISR
 //
 __interrupt void adcA1ISR(void)

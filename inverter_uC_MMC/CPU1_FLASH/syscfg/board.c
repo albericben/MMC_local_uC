@@ -376,11 +376,11 @@ void myCAN0_init(){
 	// tighter timing control. Additionally, consult the device data sheet
 	// for more information about the CAN module clocking.
 	//
-	CAN_setBitTiming(myCAN0_BASE, 3, 0, 15, 7, 3);
+	CAN_setBitTiming(myCAN0_BASE, 1, 0, 10, 7, 3);
 	//
 	// Enable CAN Interrupts
 	//
-	CAN_enableInterrupt(myCAN0_BASE, CAN_INT_IE0);
+	CAN_enableInterrupt(myCAN0_BASE, CAN_INT_IE0|CAN_INT_STATUS);
 	CAN_enableGlobalInterrupt(myCAN0_BASE, CAN_GLOBAL_INT_CANINT0);
 	//
 	// Initialize the transmit message object used for sending CAN messages.

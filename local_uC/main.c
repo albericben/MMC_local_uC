@@ -20,6 +20,8 @@
 
 #define FAN_ON_OFF_THRESH  0x07FF
 
+#define FILTER_WINDOW_SIZE 5
+
 typedef struct
 {
     uint32_t epwmModule;
@@ -49,11 +51,10 @@ void initEPWM();        // ADC Read Trigger
 void initEPWM2(void);   // SIG A
 void initEPWM3(void);   // SIG B
 
-uint8_t over_temp_thresh = 0;
-
-volatile uint16_t errorFlag = 0;
-uint8_t txMsgSuccessful  = 1;
-uint16_t txMsgData[4];
+volatile uint8_t overTempThreshold = 0;
+volatile uint8_t errorFlag = 0;
+volatile uint8_t adcDataReady = 0;
+volatile uint8_t transmitReady = 1;
 
 __interrupt void adcA1ISR(void);
 __interrupt void epwm2ISR(void);
@@ -61,18 +62,13 @@ __interrupt void epwm3ISR(void);
 __interrupt void gbl_flt_ISR(void);
 __interrupt void gbl_enbl_ISR(void);
 __interrupt void fanctrlISR(void);
+__interrupt void canSendISR(void);
 __interrupt void myCAN0_0_ISR(void);
 __interrupt void myCAN0_1_ISR(void);
 
 void updateCompare(epwmInformation *epwmInfo);
 
-//
-// Main
-//
-void main(void)
-{
-    uint8_t tx_can_msg = 1;
-
+void systemInit() {
     Device_init();
     Device_initGPIO();
 
@@ -80,11 +76,6 @@ void main(void)
     Interrupt_initVectorTable();
     Interrupt_register(INT_EPWM3, &epwm2ISR);
     Interrupt_register(INT_EPWM4, &epwm3ISR);
-
-    txMsgData[0] = 0x12;
-    txMsgData[1] = 0x34;
-    txMsgData[2] = 0x56;
-    txMsgData[3] = 0x78;
 
     // Disable sync(Freeze clock to PWM as well)
     SysCtl_disablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
@@ -109,60 +100,31 @@ void main(void)
     // Start ePWM7, enabling SOCB and putting the counter in up-count mode
     EPWM_enableADCTrigger(EPWM7_BASE, EPWM_SOC_B);
     EPWM_setTimeBaseCounterMode(EPWM7_BASE, EPWM_COUNTER_MODE_UP);
+}
 
-    // IDLE loop. Just sit and loop forever (optional):
-    for(;;)
-    {
-        if(errorFlag)
-        {
+//
+// Main
+//
+void main(void)
+{
+    systemInit();
+
+    // IDLE loop
+    for(;;) {
+        if(errorFlag) {
             GPIO_writePin(ENA_out, 0);
             GPIO_writePin(ENB_out, 0);
             asm("   ESTOP0");
         }
 
 
-        if (tx_can_msg)
-        {
-            //
-            // Transmit the message.
-            //
-             CAN_sendMessage(CANA_BASE, 1, 4, txMsgData);
+        if(adcDataReady) {
+            // process data
 
-            while(1)
-            {
-                if (txMsgSuccessful == 0) break;
-            }
-
-            txMsgData[0] += 0x01;
-            txMsgData[1] += 0x01;
-            txMsgData[2] += 0x01;
-            txMsgData[3] += 0x01;
-
-            //
-            // Reset data if exceeds a byte
-            //
-            if(txMsgData[0] > 0xFF)
-            {
-                txMsgData[0] = 0;
-            }
-            if(txMsgData[1] > 0xFF)
-            {
-                txMsgData[1] = 0;
-            }
-            if(txMsgData[2] > 0xFF)
-            {
-                txMsgData[2] = 0;
-            }
-            if(txMsgData[3] > 0xFF)
-            {
-                txMsgData[3] = 0;
-            }
-
-            //
-            // Update the flag for next message.
-            //
-            txMsgSuccessful  = 1;
+            adcDataReady = 0;
         }
+
+
     }
 }
 
@@ -228,12 +190,12 @@ __interrupt void fanctrlISR(void)
     adc_raw_ntc2 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER1);   // NTC2
     adc_raw_fans = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER5);   // FAN_SENS
 
-    if (adc_raw_ntc1 >= OVER_TEMP_THRESH && adc_raw_ntc2 >= OVER_TEMP_THRESH && over_temp_thresh == 0)
+    if (adc_raw_ntc1 >= OVER_TEMP_THRESH && adc_raw_ntc2 >= OVER_TEMP_THRESH && overTempThreshold == 0)
     {
-        over_temp_thresh = 1;
+        overTempThreshold = 1;
         GPIO_writePin(FAN_ctrl_out, 0); // turn on fan
     }
-    else if (over_temp_thresh == 1)
+    else if (overTempThreshold == 1)
     {
         if (adc_raw_ntc1 >= TEMP_HYST_THRESH && adc_raw_ntc2 >= TEMP_HYST_THRESH)
         {
@@ -248,7 +210,7 @@ __interrupt void fanctrlISR(void)
         }
         else
         {
-            over_temp_thresh = 0;
+            overTempThreshold = 0;
             GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
         }
     }
@@ -272,6 +234,29 @@ __interrupt void fanctrlISR(void)
 }
 
 //
+// cpuTimer1ISR - Counter for CpuTimer1
+//
+__interrupt void canSendISR(void)
+{
+    if (transmitReady == 1) {
+        //
+        // Transmit the message.
+        //
+        uint16_t txMsgData[4];
+        txMsgData[0] = (adc_raw_vdc1 >> 8) & 0x0F;
+        txMsgData[1] = adc_raw_vdc1 & 0xFF;
+        txMsgData[2] = (adc_raw_vdc2 >> 8) & 0x0F;
+        txMsgData[3] = adc_raw_vdc2 & 0xFF;
+        CAN_sendMessage(CANA_BASE, 1, 4, txMsgData);
+        transmitReady = 0;
+    }
+    //
+    // Acknowledge this interrupt to receive more interrupts from group 1
+    //
+    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
+}
+
+//
 // ADC A Interrupt 1 ISR
 //
 __interrupt void adcA1ISR(void)
@@ -286,6 +271,8 @@ __interrupt void adcA1ISR(void)
     adc_raw_vac1 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER11);  // G1_VLT
     adc_raw_vac2 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER15);  // G2_VLT
 
+    adcDataReady = true;
+
     //
     // Clear the interrupt flag
     //
@@ -294,7 +281,7 @@ __interrupt void adcA1ISR(void)
     //
     // Check if overflow has occurred
     //
-    if(true == ADC_getInterruptOverflowStatus(ADCA_BASE, ADC_INT_NUMBER1))
+    if(ADC_getInterruptOverflowStatus(ADCA_BASE, ADC_INT_NUMBER1))
     {
         ADC_clearInterruptOverflowStatus(ADCA_BASE, ADC_INT_NUMBER1);
         ADC_clearInterruptStatus(ADCA_BASE, ADC_INT_NUMBER1);
@@ -316,6 +303,7 @@ __interrupt void gbl_flt_ISR(void)
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
 }
 
+// TBD: this might change to NOT of this as devices should not switch unless something has enabled them (as they are HIGH by default)
 __interrupt void gbl_enbl_ISR(void)
 {
     uint32_t enable_val;
@@ -369,6 +357,9 @@ __interrupt void myCAN0_0_ISR(void)
     {
         status = CAN_getStatus(CANA_BASE);
 
+        uint32_t rxCount, txCount;
+        bool isCANError = CAN_getErrorCount(CANA_BASE, &rxCount, &txCount);
+
         if(((status  & ~(CAN_STATUS_RXOK)) != CAN_STATUS_LEC_MSK) &&
                    ((status  & ~(CAN_STATUS_RXOK)) != CAN_STATUS_LEC_NONE))
         {
@@ -386,7 +377,7 @@ __interrupt void myCAN0_0_ISR(void)
 
         errorFlag = 0;
 
-        txMsgSuccessful  = 0;
+        transmitReady = 1;
     }
     else if(status == 2)
     {

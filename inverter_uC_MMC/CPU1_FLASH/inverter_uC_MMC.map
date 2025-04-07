@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v22.6.1                     
 ******************************************************************************
->> Linked Fri Mar 28 20:16:15 2025
+>> Linked Sat Apr  5 19:02:16 2025
 
 OUTPUT FILE NAME:   <inverter_uC_MMC.out>
 ENTRY POINT SYMBOL: "code_start"  address: 00080000
@@ -378,7 +378,7 @@ __TI_handler_table @ 0008173c records: 3, size/record: 2, table size: 6
 
 LINKER GENERATED MEMRANGE CRC TABLES
 
-_ccs_flash_checksum @ 00000000 records: 10, size/record: 6, table size: 66, algorithm=C28_CHECKSUM_16(ID=13), CRC: 00000e85
+_ccs_flash_checksum @ 00000000 records: 10, size/record: 6, table size: 66, algorithm=C28_CHECKSUM_16(ID=13), CRC: 00000987
 	BEGIN: page=0, load addr=00080000, size=00000002
 	FLASH_BANK0_SEC0: page=0, load addr=00080002, size=00000ffe
 	FLASH_BANK0_SEC1: page=0, load addr=00081000, size=00001000
