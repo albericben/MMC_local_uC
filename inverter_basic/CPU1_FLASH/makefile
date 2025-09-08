@@ -4,19 +4,17 @@
 
 SHELL = cmd.exe
 
-CG_TOOL_ROOT := C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS
+CG_TOOL_ROOT := C:/ti/ccs2020/ccs/tools/compiler/ti-cgt-c2000_22.6.2.LTS
 
-GEN_OPTS__FLAG := --cmd_file="syscfg/board.opt" --cmd_file="syscfg/c2000ware_libraries.opt" 
+GEN_OPTS__FLAG := 
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
 "./inverter_basic.obj" \
-"./syscfg/board.obj" \
-"./syscfg/c2000ware_libraries.obj" \
 "./device/device.obj" \
 "./device/f28002x_codestartbranch.obj" \
 "../280023_FLASH_lnk.cmd" \
-"C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib" \
+"C:/ti/ccs2020/ccs/eclipse/COM_TI_C2000WARE_SOFTWARE_PACKAGE_INSTALL_DIR/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib" \
 $(GEN_CMDS__FLAG) \
 -lc2000ware_libraries.cmd.genlibs \
 -llibc.a \
@@ -142,16 +140,16 @@ all: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 inverter_basic.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: C2000 Linker'
-	"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --idiv_support=idiv0 --tmu_support=tmu0 -Ooff --define=DEBUG --define=_FLASH --diag_suppress=10063 --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"inverter_basic.map" --heap_size=0x100 --stack_size=0x200 --warn_sections -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib" -i"C:/ti/c2000/C2000Ware_5_01_00_00" -i"C:/Users/alber/Documents/MMC_local_uC/inverter_basic/CPU1_FLASH/syscfg" -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include" --reread_libs --define=_FLASH --diag_wrap=off --display_error_number --xml_link_info="inverter_basic_linkInfo.xml" --entry_point=code_start --rom_model -o "inverter_basic.out" $(ORDERED_OBJS)
+	"C:/ti/ccs2020/ccs/tools/compiler/ti-cgt-c2000_22.6.2.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --idiv_support=idiv0 --tmu_support=tmu0 -Ooff --define=DEBUG --define=_FLASH --diag_suppress=10063 --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"inverter_basic.map" --heap_size=0x100 --stack_size=0x200 --warn_sections -i"C:/ti/ccs2020/ccs/tools/compiler/ti-cgt-c2000_22.6.2.LTS/lib" -i"C:/Users/alber/workspace_ccstheia/inverter_basic/CPU1_FLASH/syscfg" -i"C:/ti/ccs2020/ccs/tools/compiler/ti-cgt-c2000_22.6.2.LTS/include" --reread_libs --define=_FLASH --diag_wrap=off --display_error_number --xml_link_info="inverter_basic_linkInfo.xml" --entry_point=code_start --rom_model -o "inverter_basic.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 	@$(MAKE) --no-print-directory post-build
 
 # Other Targets
 clean:
-	-$(RM) $(GEN_MISC_FILES__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "inverter_basic.obj" "syscfg\board.obj" "syscfg\c2000ware_libraries.obj" "device\device.obj" "device\f28002x_codestartbranch.obj" 
-	-$(RM) "inverter_basic.d" "syscfg\board.d" "syscfg\c2000ware_libraries.d" "device\device.d" 
+	-$(RM) $(GEN_MISC_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
+	-$(RM) "inverter_basic.obj" "device\device.obj" "device\f28002x_codestartbranch.obj" 
+	-$(RM) "inverter_basic.d" "device\device.d" 
 	-$(RM) "device\f28002x_codestartbranch.d" 
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
 	-@echo 'Finished clean'
@@ -159,9 +157,9 @@ clean:
 
 post-build:
 	-echo "========= Build of the CLB simulation has moved to the CLB Tool. Click the '?' icon by the _Generate CLB Simulation File_ enable for more details (located in the Global Parameters of the Tile Design SysConfig module) ============="
-	-if 0 == 1  C:/ti/ccs1260/ccs/tools/node/node.exe "C:/ti/c2000/C2000Ware_5_01_00_00/utilities/clb_tool/clb_syscfg/dot_file_libraries/clbDotUtility.js"  "C:/ti/c2000/C2000Ware_5_01_00_00/utilities/clb_tool/clb_syscfg/" "C:/Users/alber/Documents/MMC_local_uC/inverter_basic/CPU1_FLASH/syscfg" "C:/Users/alber/Documents/MMC_local_uC/inverter_basic/CPU1_FLASH/syscfg/clb.dot"
-	-if 0 == 1  mkdir "C:/Users/alber/Documents/MMC_local_uC/inverter_basic/CPU1_FLASH/diagrams"
-	-if 0 == 1  C:/ti/ccs1260/ccs/tools/node/node.exe "C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/.meta/generate_diagrams.js" "C:/ti/c2000/C2000Ware_5_01_00_00" "C:/Users/alber/Documents/MMC_local_uC/inverter_basic/CPU1_FLASH/diagrams" "C:/Users/alber/Documents/MMC_local_uC/inverter_basic/CPU1_FLASH/syscfg"
+	-if 0 == 1  C:/ti/ccs2020/ccs/tools/node/node.exe "/utilities/clb_tool/clb_syscfg/dot_file_libraries/clbDotUtility.js"  "/utilities/clb_tool/clb_syscfg/" "C:/Users/alber/workspace_ccstheia/inverter_basic/CPU1_FLASH/syscfg" "C:/Users/alber/workspace_ccstheia/inverter_basic/CPU1_FLASH/syscfg/clb.dot"
+	-if 0 == 1  mkdir "C:/Users/alber/workspace_ccstheia/inverter_basic/CPU1_FLASH/diagrams"
+	-if 0 == 1  C:/ti/ccs2020/ccs/tools/node/node.exe "/driverlib/.meta/generate_diagrams.js" "" "C:/Users/alber/workspace_ccstheia/inverter_basic/CPU1_FLASH/diagrams" "C:/Users/alber/workspace_ccstheia/inverter_basic/CPU1_FLASH/syscfg"
 	-@echo ' '
 
 .PHONY: all clean dependents

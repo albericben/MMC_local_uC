@@ -137,13 +137,6 @@ void PinMux_init()
 	GPIO_setPadConfig(myEPWM3_EPWMB_GPIO, GPIO_PIN_TYPE_STD);
 	GPIO_setQualificationMode(myEPWM3_EPWMB_GPIO, GPIO_QUAL_SYNC);
 
-	//
-	// EPWM5 -> fanPWM Pinmux
-	//
-	GPIO_setPinConfig(fanPWM_EPWMA_PIN_CONFIG);
-	GPIO_setPadConfig(fanPWM_EPWMA_GPIO, GPIO_PIN_TYPE_STD);
-	GPIO_setQualificationMode(fanPWM_EPWMA_GPIO, GPIO_QUAL_SYNC);
-
 	// GPIO0 -> CSIG2_in Pinmux
 	GPIO_setPinConfig(GPIO_0_GPIO0);
 	// GPIO1 -> CSIG1_in Pinmux
@@ -160,6 +153,8 @@ void PinMux_init()
 	GPIO_setPinConfig(GPIO_32_GPIO32);
 	// GPIO33 -> EN_in Pinmux
 	GPIO_setPinConfig(GPIO_33_GPIO33);
+	// GPIO16 -> FAN_ctrl_out Pinmux
+	GPIO_setPinConfig(GPIO_16_GPIO16);
 
 }
 
@@ -176,9 +171,11 @@ void myADC0_init(){
 	//
 	// ADC Initialization: Write ADC configurations and power up the ADC
 	//
-	// Configures the ADC module's offset trim
+	// Set the analog voltage reference selection and ADC module's offset trims.
+	// This function sets the analog voltage reference to internal (with the reference voltage of 1.65V or 2.5V) or external for ADC
+	// which is same as ASysCtl APIs.
 	//
-	ADC_setOffsetTrimAll(ADC_REFERENCE_INTERNAL,ADC_REFERENCE_3_3V);
+	ADC_setVREF(myADC0_BASE, ADC_REFERENCE_INTERNAL, ADC_REFERENCE_3_3V);
 	//
 	// Configures the analog-to-digital converter module prescaler.
 	//
@@ -321,6 +318,7 @@ void myADC0_init(){
 	ADC_disableContinuousMode(myADC0_BASE, ADC_INT_NUMBER1);
 	ADC_enableInterrupt(myADC0_BASE, ADC_INT_NUMBER1);
 }
+
 
 //*****************************************************************************
 //
@@ -530,44 +528,6 @@ void EPWM_init(){
     EPWM_enableInterrupt(myEPWM3_BASE);	
     EPWM_setInterruptSource(myEPWM3_BASE, EPWM_INT_TBCTR_ZERO);	
     EPWM_setInterruptEventCount(myEPWM3_BASE, 3);	
-    EPWM_setClockPrescaler(fanPWM_BASE, EPWM_CLOCK_DIVIDER_1, EPWM_HSCLOCK_DIVIDER_1);	
-    EPWM_setTimeBasePeriod(fanPWM_BASE, 2000);	
-    EPWM_enableGlobalLoadRegisters(fanPWM_BASE, EPWM_GL_REGISTER_TBPRD_TBPRDHR);	
-    EPWM_setTimeBaseCounter(fanPWM_BASE, 0);	
-    EPWM_setTimeBaseCounterMode(fanPWM_BASE, EPWM_COUNTER_MODE_UP);	
-    EPWM_disablePhaseShiftLoad(fanPWM_BASE);	
-    EPWM_setPhaseShift(fanPWM_BASE, 0);	
-    EPWM_setSyncInPulseSource(fanPWM_BASE, EPWM_SYNC_IN_PULSE_SRC_SYNCOUT_EPWM5);	
-    EPWM_setCounterCompareValue(fanPWM_BASE, EPWM_COUNTER_COMPARE_A, 1000);	
-    EPWM_enableGlobalLoadRegisters(fanPWM_BASE, EPWM_GL_REGISTER_CMPA_CMPAHR);	
-    EPWM_disableCounterCompareShadowLoadMode(fanPWM_BASE, EPWM_COUNTER_COMPARE_A);	
-    EPWM_setCounterCompareShadowLoadMode(fanPWM_BASE, EPWM_COUNTER_COMPARE_A, EPWM_COMP_LOAD_ON_CNTR_ZERO);	
-    EPWM_setupEPWMLinks(fanPWM_BASE, EPWM_LINK_WITH_EPWM_5, EPWM_LINK_COMP_A);	
-    EPWM_setCounterCompareValue(fanPWM_BASE, EPWM_COUNTER_COMPARE_B, 0);	
-    EPWM_disableCounterCompareShadowLoadMode(fanPWM_BASE, EPWM_COUNTER_COMPARE_B);	
-    EPWM_setCounterCompareShadowLoadMode(fanPWM_BASE, EPWM_COUNTER_COMPARE_B, EPWM_COMP_LOAD_ON_CNTR_ZERO);	
-    EPWM_enableGlobalLoadRegisters(fanPWM_BASE, EPWM_GL_REGISTER_AQCSFRC);	
-    EPWM_setActionQualifierContSWForceShadowMode(fanPWM_BASE, EPWM_AQ_SW_IMMEDIATE_LOAD);	
-    EPWM_enableGlobalLoadRegisters(fanPWM_BASE, EPWM_GL_REGISTER_AQCTLA_AQCTLA2);	
-    EPWM_setActionQualifierAction(fanPWM_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_ZERO);	
-    EPWM_setActionQualifierAction(fanPWM_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_PERIOD);	
-    EPWM_setActionQualifierAction(fanPWM_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPA);	
-    EPWM_setActionQualifierAction(fanPWM_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPA);	
-    EPWM_setActionQualifierAction(fanPWM_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPB);	
-    EPWM_setActionQualifierAction(fanPWM_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPB);	
-    EPWM_setActionQualifierAction(fanPWM_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_ZERO);	
-    EPWM_setActionQualifierAction(fanPWM_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_PERIOD);	
-    EPWM_setActionQualifierAction(fanPWM_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPA);	
-    EPWM_setActionQualifierAction(fanPWM_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPA);	
-    EPWM_setActionQualifierAction(fanPWM_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPB);	
-    EPWM_setActionQualifierAction(fanPWM_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_OUTPUT_NO_CHANGE, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPB);	
-    EPWM_setRisingEdgeDelayCountShadowLoadMode(fanPWM_BASE, EPWM_RED_LOAD_ON_CNTR_ZERO);	
-    EPWM_disableRisingEdgeDelayCountShadowLoadMode(fanPWM_BASE);	
-    EPWM_setFallingEdgeDelayCountShadowLoadMode(fanPWM_BASE, EPWM_FED_LOAD_ON_CNTR_ZERO);	
-    EPWM_disableFallingEdgeDelayCountShadowLoadMode(fanPWM_BASE);	
-    EPWM_enableInterrupt(fanPWM_BASE);	
-    EPWM_setInterruptSource(fanPWM_BASE, EPWM_INT_TBCTR_ZERO);	
-    EPWM_setInterruptEventCount(fanPWM_BASE, 3);	
 }
 
 //*****************************************************************************
@@ -584,6 +544,7 @@ void GPIO_init(){
 	RDY_out_init();
 	ENA_out_init();
 	EN_in_init();
+	FAN_ctrl_out_init();
 }
 
 void CSIG2_in_init(){
@@ -613,6 +574,7 @@ void GSYNC_in_init(){
 	GPIO_setDirectionMode(GSYNC_in, GPIO_DIR_MODE_IN);
 }
 void RDY_out_init(){
+	GPIO_writePin(RDY_out, 1);
 	GPIO_setPadConfig(RDY_out, GPIO_PIN_TYPE_OD);
 	GPIO_setQualificationMode(RDY_out, GPIO_QUAL_SYNC);
 	GPIO_setDirectionMode(RDY_out, GPIO_DIR_MODE_OUT);
@@ -627,6 +589,12 @@ void EN_in_init(){
 	GPIO_setPadConfig(EN_in, GPIO_PIN_TYPE_STD | GPIO_PIN_TYPE_PULLUP);
 	GPIO_setQualificationMode(EN_in, GPIO_QUAL_SYNC);
 	GPIO_setDirectionMode(EN_in, GPIO_DIR_MODE_IN);
+}
+void FAN_ctrl_out_init(){
+	GPIO_writePin(FAN_ctrl_out, 0);
+	GPIO_setPadConfig(FAN_ctrl_out, GPIO_PIN_TYPE_STD);
+	GPIO_setQualificationMode(FAN_ctrl_out, GPIO_QUAL_SYNC);
+	GPIO_setDirectionMode(FAN_ctrl_out, GPIO_DIR_MODE_OUT);
 }
 
 //*****************************************************************************
@@ -653,31 +621,38 @@ void myINPUTXBARINPUT1_init(){
 //*****************************************************************************
 void INTERRUPT_init(){
 	
-	// Interrupt Setings for INT_myADC0_1
+	// Interrupt Settings for INT_myADC0_1
+	// ISR need to be defined for the registered interrupts
 	Interrupt_register(INT_myADC0_1, &adcA1ISR);
 	Interrupt_enable(INT_myADC0_1);
 	
-	// Interrupt Setings for INT_myCAN0_0
+	// Interrupt Settings for INT_myCAN0_0
+	// ISR need to be defined for the registered interrupts
 	Interrupt_register(INT_myCAN0_0, &myCAN0_0_ISR);
 	Interrupt_enable(INT_myCAN0_0);
 	
-	// Interrupt Setings for INT_myCAN0_1
+	// Interrupt Settings for INT_myCAN0_1
+	// ISR need to be defined for the registered interrupts
 	Interrupt_register(INT_myCAN0_1, &myCAN0_1_ISR);
 	Interrupt_enable(INT_myCAN0_1);
 	
-	// Interrupt Setings for INT_myCPUTIMER0
+	// Interrupt Settings for INT_myCPUTIMER0
+	// ISR need to be defined for the registered interrupts
 	Interrupt_register(INT_myCPUTIMER0, &fanctrlISR);
 	Interrupt_enable(INT_myCPUTIMER0);
 	
-	// Interrupt Setings for INT_myCPUTIMER1
-	Interrupt_register(INT_myCPUTIMER1, &fanreadISR);
+	// Interrupt Settings for INT_myCPUTIMER1
+	// ISR need to be defined for the registered interrupts
+	Interrupt_register(INT_myCPUTIMER1, &canSendISR);
 	Interrupt_enable(INT_myCPUTIMER1);
 	
-	// Interrupt Setings for INT_FLTN_in_XINT
+	// Interrupt Settings for INT_FLTN_in_XINT
+	// ISR need to be defined for the registered interrupts
 	Interrupt_register(INT_FLTN_in_XINT, &gbl_flt_ISR);
 	Interrupt_enable(INT_FLTN_in_XINT);
 	
-	// Interrupt Setings for INT_EN_in_XINT
+	// Interrupt Settings for INT_EN_in_XINT
+	// ISR need to be defined for the registered interrupts
 	Interrupt_register(INT_EN_in_XINT, &gbl_enbl_ISR);
 	Interrupt_enable(INT_EN_in_XINT);
 }

@@ -28,7 +28,7 @@
 		<link>
 			<name>driverlib.lib</name>
 			<type>1</type>
-			<location>C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib</location>
+			<location>C:/ti/c2000/C2000Ware_5_05_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib</location>
 		</link>
 	</linkedResources>
 </projectDescription>

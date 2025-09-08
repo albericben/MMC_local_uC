@@ -1,8 +1,9 @@
 /**
  * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
  * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
- * @cliArgs --device "F28002x" --package "80QFP" --part "F28002x_80QFP" --context "system" --product "C2000WARE@5.01.00.00"
- * @versions {"tool":"1.19.0+3426"}
+ * @cliArgs --device "F28002x" --part "F28002x_48QFP" --package "48QFP" --context "system" --product "C2000WARE@5.04.00.00"
+ * @v2CliArgs --device "TMS320F280025C" --package "48QFP" --context "system" --product "C2000WARE@5.04.00.00"
+ * @versions {"tool":"1.24.0+4110"}
  */
 
 /**
@@ -23,7 +24,6 @@ const cputimer2        = cputimer.addInstance();
 const epwm             = scripting.addModule("/driverlib/epwm.js", {}, false);
 const epwm1            = epwm.addInstance();
 const epwm2            = epwm.addInstance();
-const epwm3            = epwm.addInstance();
 const gpio             = scripting.addModule("/driverlib/gpio.js", {}, false);
 const gpio1            = gpio.addInstance();
 const gpio2            = gpio.addInstance();
@@ -33,6 +33,7 @@ const gpio5            = gpio.addInstance();
 const gpio6            = gpio.addInstance();
 const gpio7            = gpio.addInstance();
 const gpio8            = gpio.addInstance();
+const gpio9            = gpio.addInstance();
 const inputxbar_input  = scripting.addModule("/driverlib/inputxbar_input.js", {}, false);
 const inputxbar_input1 = inputxbar_input.addInstance();
 const inputxbar_input2 = inputxbar_input.addInstance();
@@ -94,12 +95,22 @@ adc1.adcInt1.enableInterrupt        = true;
 
 aio1.padConfig              = "PULLUP";
 aio1.$name                  = "TACH_in";
+aio1.aioPin.$assign         = "AIO244";
 aio1.aioPin["AIO#"].$assign = "A5/C2";
 
-analog1.$name            = "myANALOGPinMux0";
-adc1.analog              = analog1;
-analog1.useCase          = "CUSTOM";
-analog1.useInterfacePins = ["A0/C15","A1","A10/C10","A11/C0","A15/C7","A2/C9","A3/C5/VDAC","A7/C3"];
+analog1.$name                           = "myANALOGPinMux0";
+adc1.analog                             = analog1;
+analog1.useCase                         = "CUSTOM";
+analog1.useInterfacePins                = ["A0/C15","A1","A10/C10","A11/C0","A15/C7","A2/C9","A3/C5/VDAC","A7/C3"];
+analog1.analog.$assign                  = "ANALOG";
+analog1.analog["a0/c15Pin"].$assign     = "A0/C15";
+analog1.analog.a1Pin.$assign            = "A1";
+analog1.analog["a10/c10Pin"].$assign    = "A10/C10";
+analog1.analog["a11/c0Pin"].$assign     = "A11/C0";
+analog1.analog["a15/c7Pin"].$assign     = "A15/C7";
+analog1.analog["a2/c9Pin"].$assign      = "A2/C9";
+analog1.analog["a3/c5/vdacPin"].$assign = "A3/C5/VDAC";
+analog1.analog["a7/c3Pin"].$assign      = "A7/C3";
 
 asysctl.analogReference        = "INTERNAL";
 asysctl.analogReferenceVoltage = "1P65";
@@ -112,9 +123,6 @@ can1.interruptLine            = ["CAN_GLOBAL_INT_CANINT0"];
 can1.loopbackMode             = "CAN_TEST_LBACK";
 can1.interruptFlags           = ["CAN_INT_IE0","CAN_INT_STATUS"];
 can1.sysClock                 = 20;
-can1.bitTime                  = 20;
-can1.bitTimeSeg1              = 10;
-can1.bitRatePrescaler         = 1;
 can1.can.$assign              = "CANA";
 can1.can.can_rxPin.$assign    = "GPIO3";
 can1.can.can_txPin.$assign    = "GPIO2";
@@ -146,7 +154,7 @@ cputimer2.registerInterrupts        = true;
 cputimer2.startTimer                = true;
 cputimer2.timerPeriod               = 100000;
 cputimer2.timerInt.enableInterrupt  = true;
-cputimer2.timerInt.interruptHandler = "fanreadISR";
+cputimer2.timerInt.interruptHandler = "canSendISR";
 
 epwm1.epwmTimebase_hsClockDiv                                  = "EPWM_HSCLOCK_DIVIDER_1";
 epwm1.epwmEventTrigger_enableInterrupt                         = true;
@@ -200,31 +208,6 @@ epwm2.epwmTimebase_period                                      = 20000;
 epwm2.epwm.$assign                                             = "EPWM3";
 epwm2.epwm.epwm_bPin.$assign                                   = "GPIO5";
 
-epwm3.epwmTimebase_hsClockDiv                                  = "EPWM_HSCLOCK_DIVIDER_1";
-epwm3.epwmEventTrigger_enableInterrupt                         = true;
-epwm3.epwmEventTrigger_interruptSource                         = "EPWM_INT_TBCTR_ZERO";
-epwm3.epwmEventTrigger_interruptEventCount                     = "3";
-epwm3.useCase                                                  = "CUSTOM";
-epwm3.epwmTimebase_periodGld                                   = true;
-epwm3.epwmCounterCompare_enableShadowLoadModeCMPA              = false;
-epwm3.epwmCounterCompare_enableShadowLoadModeCMPB              = false;
-epwm3.epwmActionQualifier_continousSwForceReloadMode           = "EPWM_AQ_SW_IMMEDIATE_LOAD";
-epwm3.epwmActionQualifier_continousSwForceReloadModeGld        = true;
-epwm3.epwmTimebase_counterMode                                 = "EPWM_COUNTER_MODE_UP";
-epwm3.$name                                                    = "fanPWM";
-epwm3.useInterfacePins                                         = ["EPWM#_A"];
-epwm3.epwmCounterCompare_cmpALink                              = "EPWM_LINK_WITH_EPWM_5";
-epwm3.epwmCounterCompare_cmpA                                  = 1000;
-epwm3.epwmCounterCompare_cmpAGld                               = true;
-epwm3.epwmActionQualifier_EPWM_AQ_OUTPUT_A_gld                 = true;
-epwm3.epwmTimebase_syncInPulseSource                           = "EPWM_SYNC_IN_PULSE_SRC_SYNCOUT_EPWM5";
-epwm3.epwmActionQualifier_EPWM_AQ_OUTPUT_A_ON_TIMEBASE_ZERO    = "EPWM_AQ_OUTPUT_LOW";
-epwm3.epwmActionQualifier_EPWM_AQ_OUTPUT_A_ON_TIMEBASE_PERIOD  = "EPWM_AQ_OUTPUT_LOW";
-epwm3.epwmActionQualifier_EPWM_AQ_OUTPUT_A_ON_TIMEBASE_UP_CMPA = "EPWM_AQ_OUTPUT_HIGH";
-epwm3.epwmTimebase_period                                      = 2000;
-epwm3.epwm.$assign                                             = "EPWM5";
-epwm3.epwm.epwm_aPin.$assign                                   = "GPIO16";
-
 gpio1.padConfig       = "PULLUP";
 gpio1.$name           = "CSIG2_in";
 gpio1.gpioPin.$assign = "GPIO0";
@@ -251,10 +234,12 @@ gpio5.$name           = "GSYNC_in";
 gpio5.padConfig       = "PULLUP";
 gpio5.gpioPin.$assign = "GPIO12";
 
-gpio6.padConfig       = "OD";
-gpio6.direction       = "GPIO_DIR_MODE_OUT";
-gpio6.$name           = "RDY_out";
-gpio6.gpioPin.$assign = "GPIO24";
+gpio6.padConfig         = "OD";
+gpio6.direction         = "GPIO_DIR_MODE_OUT";
+gpio6.$name             = "RDY_out";
+gpio6.writeInitialValue = true;
+gpio6.initialValue      = 1;
+gpio6.gpioPin.$assign   = "GPIO24";
 
 gpio7.$name             = "ENA_out";
 gpio7.direction         = "GPIO_DIR_MODE_OUT";
@@ -273,6 +258,11 @@ gpio8.xint.registerInterrupts    = true;
 gpio8.xint.xInt.interruptHandler = "gbl_enbl_ISR";
 gpio8.xint.xInt.enableInterrupt  = true;
 
+gpio9.$name             = "FAN_ctrl_out";
+gpio9.direction         = "GPIO_DIR_MODE_OUT";
+gpio9.writeInitialValue = true;
+gpio9.gpioPin.$assign   = "GPIO16";
+
 inputxbar_input1.$name         = "myINPUTXBARINPUT0";
 gpio3.xint.inputxbar           = inputxbar_input1;
 inputxbar_input1.inputxbarGpio = "GPIO4";
@@ -280,19 +270,3 @@ inputxbar_input1.inputxbarGpio = "GPIO4";
 inputxbar_input2.$name         = "myINPUTXBARINPUT1";
 gpio8.xint.inputxbar           = inputxbar_input2;
 inputxbar_input2.inputxbarGpio = "GPIO33";
-
-/**
- * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
- * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
- * re-solve from scratch.
- */
-aio1.aioPin.$suggestSolution                     = "AIO244";
-analog1.analog.$suggestSolution                  = "ANALOG";
-analog1.analog["a0/c15Pin"].$suggestSolution     = "A0/C15";
-analog1.analog.a1Pin.$suggestSolution            = "A1";
-analog1.analog["a10/c10Pin"].$suggestSolution    = "A10/C10";
-analog1.analog["a11/c0Pin"].$suggestSolution     = "A11/C0";
-analog1.analog["a15/c7Pin"].$suggestSolution     = "A15/C7";
-analog1.analog["a2/c9Pin"].$suggestSolution      = "A2/C9";
-analog1.analog["a3/c5/vdacPin"].$suggestSolution = "A3/C5/VDAC";
-analog1.analog["a7/c3Pin"].$suggestSolution      = "A7/C3";

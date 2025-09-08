@@ -12,7 +12,7 @@ SYSCFG_SRCS += \
 ../inverter_basic.syscfg 
 
 LIB_SRCS += \
-C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib 
+C:/ti/c2000/C2000Ware_5_05_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib 
 
 C_SRCS += \
 ../inverter_basic.c \
@@ -45,6 +45,7 @@ OBJS += \
 GEN_MISC_FILES += \
 ./syscfg/board.h \
 ./syscfg/board.cmd.genlibs \
+./syscfg/board.json \
 ./syscfg/pinmux.csv \
 ./syscfg/epwm.dot \
 ./syscfg/c2000ware_libraries.cmd.genlibs \
@@ -62,6 +63,7 @@ OBJS__QUOTED += \
 GEN_MISC_FILES__QUOTED += \
 "syscfg\board.h" \
 "syscfg\board.cmd.genlibs" \
+"syscfg\board.json" \
 "syscfg\pinmux.csv" \
 "syscfg\epwm.dot" \
 "syscfg\c2000ware_libraries.cmd.genlibs" \
@@ -83,8 +85,5 @@ C_SRCS__QUOTED += \
 "../inverter_basic.c" \
 "./syscfg/board.c" \
 "./syscfg/c2000ware_libraries.c" 
-
-SYSCFG_SRCS__QUOTED += \
-"../inverter_basic.syscfg" 
 
 

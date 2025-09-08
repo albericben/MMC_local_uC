@@ -12,77 +12,37 @@ SYSCFG_SRCS += \
 ../inverter_basic.syscfg 
 
 LIB_SRCS += \
-C:/ti/c2000/C2000Ware_5_01_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib 
+C:/ti/ccs2020/ccs/eclipse/COM_TI_C2000WARE_SOFTWARE_PACKAGE_INSTALL_DIR/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib 
 
 C_SRCS += \
-../inverter_basic.c \
-./syscfg/board.c \
-./syscfg/c2000ware_libraries.c 
-
-GEN_FILES += \
-./syscfg/board.c \
-./syscfg/board.opt \
-./syscfg/c2000ware_libraries.opt \
-./syscfg/c2000ware_libraries.c 
+../inverter_basic.c 
 
 GEN_MISC_DIRS += \
 ./syscfg 
 
 C_DEPS += \
-./inverter_basic.d \
-./syscfg/board.d \
-./syscfg/c2000ware_libraries.d 
-
-GEN_OPTS += \
-./syscfg/board.opt \
-./syscfg/c2000ware_libraries.opt 
+./inverter_basic.d 
 
 OBJS += \
-./inverter_basic.obj \
-./syscfg/board.obj \
-./syscfg/c2000ware_libraries.obj 
+./inverter_basic.obj 
 
 GEN_MISC_FILES += \
-./syscfg/board.h \
-./syscfg/board.cmd.genlibs \
-./syscfg/pinmux.csv \
-./syscfg/epwm.dot \
-./syscfg/c2000ware_libraries.cmd.genlibs \
-./syscfg/c2000ware_libraries.h \
-./syscfg/clocktree.h 
+./syscfg/error.h 
 
 GEN_MISC_DIRS__QUOTED += \
 "syscfg" 
 
 OBJS__QUOTED += \
-"inverter_basic.obj" \
-"syscfg\board.obj" \
-"syscfg\c2000ware_libraries.obj" 
+"inverter_basic.obj" 
 
 GEN_MISC_FILES__QUOTED += \
-"syscfg\board.h" \
-"syscfg\board.cmd.genlibs" \
-"syscfg\pinmux.csv" \
-"syscfg\epwm.dot" \
-"syscfg\c2000ware_libraries.cmd.genlibs" \
-"syscfg\c2000ware_libraries.h" \
-"syscfg\clocktree.h" 
+"syscfg\error.h" 
 
 C_DEPS__QUOTED += \
-"inverter_basic.d" \
-"syscfg\board.d" \
-"syscfg\c2000ware_libraries.d" 
-
-GEN_FILES__QUOTED += \
-"syscfg\board.c" \
-"syscfg\board.opt" \
-"syscfg\c2000ware_libraries.opt" \
-"syscfg\c2000ware_libraries.c" 
+"inverter_basic.d" 
 
 C_SRCS__QUOTED += \
-"../inverter_basic.c" \
-"./syscfg/board.c" \
-"./syscfg/c2000ware_libraries.c" 
+"../inverter_basic.c" 
 
 SYSCFG_SRCS__QUOTED += \
 "../inverter_basic.syscfg" 

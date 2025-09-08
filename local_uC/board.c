@@ -566,6 +566,7 @@ void GSYNC_in_init(){
     GPIO_setDirectionMode(GSYNC_in, GPIO_DIR_MODE_IN);
 }
 void RDY_out_init(){
+    GPIO_writePin(RDY_out, 1);
     GPIO_setPadConfig(RDY_out, GPIO_PIN_TYPE_OD);
     GPIO_setQualificationMode(RDY_out, GPIO_QUAL_SYNC);
     GPIO_setDirectionMode(RDY_out, GPIO_DIR_MODE_OUT);

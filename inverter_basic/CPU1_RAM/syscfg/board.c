@@ -302,7 +302,8 @@ void myINPUTXBARINPUT1_init(){
 //*****************************************************************************
 void INTERRUPT_init(){
 	
-	// Interrupt Setings for INT_FLTN_in_XINT
+	// Interrupt Settings for INT_FLTN_in_XINT
+	// ISR need to be defined for the registered interrupts
 	Interrupt_register(INT_FLTN_in_XINT, &gbl_flt_ISR);
 	Interrupt_enable(INT_FLTN_in_XINT);
 }

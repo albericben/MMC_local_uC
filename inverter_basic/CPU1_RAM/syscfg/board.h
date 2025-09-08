@@ -169,6 +169,7 @@ void myINPUTXBARINPUT1_init();
 //*****************************************************************************
 
 // Interrupt Settings for INT_FLTN_in_XINT
+// ISR need to be defined for the registered interrupts
 #define INT_FLTN_in_XINT INT_XINT1
 #define INT_FLTN_in_XINT_INTERRUPT_ACK_GROUP INTERRUPT_ACK_GROUP1
 extern __interrupt void gbl_flt_ISR(void);

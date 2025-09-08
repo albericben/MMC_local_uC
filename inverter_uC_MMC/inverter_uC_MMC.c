@@ -11,21 +11,18 @@
 #define EPWM3_TIMER_TBPRD  20000US
 #define EPWM3_MAX_CMPB     19000U
 #define EPWM3_MIN_CMPB      1000U
+#define DELAY_COUNT        10000U
 
 #define EPWM_CMP_UP           1U
 #define EPWM_CMP_DOWN         0U
 
-#define OVER_TEMP_THRESH   0x0AFF
-#define FAN_START_TEMP_THRESH   0x08FF
-#define TEMP_HYST_THRESH   FAN_START_TEMP_THRESH-0x00FF
+#define OVER_TEMP_THRESH 0x0DA0 // 80C with NTCALUG39A103GA
+#define FAN_ON_OFF_TEMP_THRESH 0x0AAB // 45C with NTCALUG39A103GA
+#define TEMP_HYST_THRESH   0x0A00 // 35C with NTCALUG39A103GA
 
 #define FAN_ON_OFF_THRESH  0x07FF
 
-#define HIGH    1U
-#define LOW     0U
-
-#define FAN_ON      0U
-#define FAN_OFF     1U
+#define FILTER_WINDOW_SIZE 5
 
 typedef struct
 {
@@ -41,64 +38,44 @@ typedef struct
 
 epwmInformation epwm2Info;
 epwmInformation epwm3Info;
-epwmInformation epwmfanInfo;
 
 uint16_t adc_raw_ntc1;   // NTC1 PIN
 uint16_t adc_raw_ntc2;   // NTC2 PIN
 uint16_t adc_raw_iac1;   // G1_CUR PIN
 uint16_t adc_raw_iac2;   // G2_CUR PIN
+uint16_t adc_raw_fans;   // FAN_SENS PIN
 uint16_t adc_raw_vdc1;   // DC1_LNK PIN
 uint16_t adc_raw_vdc2;  // DC2_LNK PIN
 uint16_t adc_raw_vac1;  // G1_VLT PIN
 uint16_t adc_raw_vac2;  // G2_VLT PIN
 
-uint16_t target_fan_duty = 0;
-uint16_t fan_duty = 0;
-
-volatile uint16_t capCount;
-
 void initEPWM();        // ADC Read Trigger
 void initEPWM2(void);   // SIG A
 void initEPWM3(void);   // SIG B
 
-volatile uint16_t errorFlag = 0;
-uint8_t txMsgSuccessful  = 1;
-uint16_t txMsgData[4];
-
-volatile uint8_t fan_sensor = 0;
-volatile uint16_t tach_count;
-volatile uint8_t prev_tach_read;
-volatile uint8_t fan_started = 0;
-
-enum fan_state {
-  FAN_START = 0,
-  FAN_WAITING,
-  FAN_RUNNING,
-  FAN_FAULTED
-};
-
-enum fan_state fanState = FAN_START;
+volatile bool overTempThreshold = false;
+volatile bool fanRunning = true;
+static bool fanTachPresent = false;
+static bool isTempSensePresent = true;
+volatile uint8_t errorFlag = 0;
+volatile uint8_t adcDataReady = 0;
+volatile uint8_t transmitReady = 1;
+volatile bool faultPresent = false;
+volatile uint16_t readyResetCount = 0;
 
 __interrupt void adcA1ISR(void);
 __interrupt void epwm2ISR(void);
 __interrupt void epwm3ISR(void);
-__interrupt void fanISR(void);
 __interrupt void gbl_flt_ISR(void);
 __interrupt void gbl_enbl_ISR(void);
 __interrupt void fanctrlISR(void);
-__interrupt void fanreadISR(void);
+__interrupt void canSendISR(void);
 __interrupt void myCAN0_0_ISR(void);
 __interrupt void myCAN0_1_ISR(void);
 
 void updateCompare(epwmInformation *epwmInfo);
 
-//
-// Main
-//
-void main(void)
-{
-    uint8_t tx_can_msg = 1;
-
+void systemInit() {
     Device_init();
     Device_initGPIO();
 
@@ -106,12 +83,6 @@ void main(void)
     Interrupt_initVectorTable();
     Interrupt_register(INT_EPWM3, &epwm2ISR);
     Interrupt_register(INT_EPWM4, &epwm3ISR);
-    Interrupt_register(INT_EPWM5, &fanISR);
-
-    txMsgData[0] = 0x12;
-    txMsgData[1] = 0x34;
-    txMsgData[2] = 0x56;
-    txMsgData[3] = 0x78;
 
     // Disable sync(Freeze clock to PWM as well)
     SysCtl_disablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
@@ -128,69 +99,46 @@ void main(void)
     // Enable ePWM interrupts
     Interrupt_enable(INT_EPWM3);
     Interrupt_enable(INT_EPWM4);
-    Interrupt_enable(INT_EPWM5);
 
-    // Enable Global Interrupt (INTM) and real-time interrupt (DBGM)
+    // Enable Global Interrupt (INTM) and realtime interrupt (DBGM)
     EINT;
     ERTM;
 
     // Start ePWM7, enabling SOCB and putting the counter in up-count mode
     EPWM_enableADCTrigger(EPWM7_BASE, EPWM_SOC_B);
     EPWM_setTimeBaseCounterMode(EPWM7_BASE, EPWM_COUNTER_MODE_UP);
+}
 
-    // Enable start
-    GPIO_writePin(ENA_out, HIGH);
-    GPIO_writePin(ENB_out, HIGH);
+//
+// Main
+//
+void main(void)
+{
+    systemInit();
 
-    // IDLE loop. Just sit and loop forever (optional):
-    for(;;)
-    {
-        if(errorFlag)
-        {
-            GPIO_writePin(ENA_out, LOW);
-            GPIO_writePin(ENB_out, LOW);
+    // IDLE loop
+    for(;;) {
+        if(overTempThreshold) {
+            GPIO_writePin(ENA_out, 0);
+            GPIO_writePin(ENB_out, 0);
             asm("   ESTOP0");
         }
 
-
-        if (tx_can_msg)
-        {
-            //
-            // Transmit the message.
-            //
-            CAN_sendMessage(CANA_BASE, 1, 4, txMsgData);
-
-            while(txMsgSuccessful == 1);
-
-            txMsgData[0] += 0x01;
-            txMsgData[1] += 0x01;
-            txMsgData[2] += 0x01;
-            txMsgData[3] += 0x01;
-
-            //
-            // Reset data if exceeds a byte
-            //
-            if(txMsgData[0] > 0xFF)
-            {
-                txMsgData[0] = 0;
+        if (faultPresent) {
+            if (readyResetCount == 0) {
+                GPIO_writePin(RDY_out, 0); // turn off READY
+            } else if (readyResetCount >= DELAY_COUNT) {
+                GPIO_writePin(RDY_out, 1); // turn on READY
+                faultPresent = false;
+                readyResetCount = 0;
             }
-            if(txMsgData[1] > 0xFF)
-            {
-                txMsgData[1] = 0;
-            }
-            if(txMsgData[2] > 0xFF)
-            {
-                txMsgData[2] = 0;
-            }
-            if(txMsgData[3] > 0xFF)
-            {
-                txMsgData[3] = 0;
-            }
+            readyResetCount++;
+        }
 
-            //
-            // Update the flag for next message.
-            //
-            txMsgSuccessful  = 1;
+        if(adcDataReady) {
+            // process data
+
+            adcDataReady = 0;
         }
     }
 }
@@ -248,104 +196,77 @@ void initEPWM3(void)
 }
 
 //
-// initEPWM3 - Configure ePWM3
-//
-void initEPWMFAN(void)
-{
-    epwmfanInfo.epwmCompADirection = EPWM_CMP_UP;
-    epwmfanInfo.epwmCompBDirection = EPWM_CMP_DOWN;
-    epwmfanInfo.epwmTimerIntCount = 0U;
-    epwmfanInfo.epwmModule = fanPWM_BASE;
-    epwmfanInfo.epwmMaxCompB = EPWM3_MAX_CMPB;
-    epwmfanInfo.epwmMinCompB = EPWM3_MIN_CMPB;
-}
-
-//
 // cpuTimer0ISR - Counter for CpuTimer0
 //
 __interrupt void fanctrlISR(void)
-{
-    // Low priority reads for fan control - could be moved to slower timer
-    adc_raw_ntc1 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER0);   // NTC1
-    adc_raw_ntc2 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER1);   // NTC2
+{   
+    if (isTempSensePresent) {
+        // Low priority reads for fan control - could be moved to slower timer
+        adc_raw_ntc1 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER0);   // NTC1
+        adc_raw_ntc2 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER1);   // NTC2
 
-    // Controller code to update PWM
-    switch (fanState)
-    {
-    case FAN_START:
-        target_fan_duty = 0;
-        fanState = FAN_WAITING;
-        break;
+        if (adc_raw_ntc1 >= OVER_TEMP_THRESH || adc_raw_ntc2 >= OVER_TEMP_THRESH) {
+            overTempThreshold = true;
+            fanRunning = true;
+            GPIO_writePin(FAN_ctrl_out, 0);  // turn on fan
+        } else if (fanTachPresent == false) {
+            if (adc_raw_ntc1 >= FAN_ON_OFF_TEMP_THRESH || adc_raw_ntc2 >= FAN_ON_OFF_TEMP_THRESH)
+            {
+                fanRunning = true;
+                GPIO_writePin(FAN_ctrl_out, 0); // turn on fan
+            } else if (fanRunning) {
+                if (adc_raw_ntc1 < TEMP_HYST_THRESH && adc_raw_ntc2 < TEMP_HYST_THRESH)
+                {
+                    fanRunning = false;
+                    GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
+                }
+            }
+        } else {
+            adc_raw_fans = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER5);   // FAN_SENS
 
-    case FAN_WAITING:
-        if (fan_started == 1 && fan_sensor == 1)
-        {
-            fanState = FAN_FAULTED;
+            if ((adc_raw_ntc1 >= FAN_ON_OFF_TEMP_THRESH || adc_raw_ntc2 >= FAN_ON_OFF_TEMP_THRESH) && !fanRunning)
+            {
+                fanRunning = true;
+                GPIO_writePin(FAN_ctrl_out, 0); // turn on fan
+            }
+            else if (fanRunning)
+            {
+                if (adc_raw_ntc1 >= TEMP_HYST_THRESH || adc_raw_ntc2 >= TEMP_HYST_THRESH)
+                {
+                    if (adc_raw_fans < FAN_ON_OFF_THRESH)
+                    {
+                        GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
+                        GPIO_writePin(ENA_out, 0);
+                        GPIO_writePin(ENB_out, 0);
+                        // TO DO: Write (CAN TX) fan fault message high
+                    }
+                    // Leave fan on
+                }
+                else
+                {
+                    fanRunning = false;
+                    GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
+                }
+            }
+            else
+            {
+                if (adc_raw_fans >= FAN_ON_OFF_THRESH)
+                {
+                    GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
+                    GPIO_writePin(ENA_out, 0);
+                    GPIO_writePin(ENB_out, 0);
+                    // TO DO: Write (CAN TX) fan fault message high when was meant to be low
+                }
+            }
         }
-        else if (adc_raw_ntc1 >= FAN_START_TEMP_THRESH && adc_raw_ntc2 >= FAN_START_TEMP_THRESH)
-        {
-            fanState = FAN_RUNNING;
-            fan_duty = 500; // start at 25%
-            target_fan_duty = 1500;
+    } else {
+        overTempThreshold = false;
+        if (!fanRunning) {
+            fanRunning = true;
+            GPIO_writePin(FAN_ctrl_out, 0);  // turn on fan
         }
-        break;
-
-    case FAN_RUNNING:
-        if (fan_started == 0 && fan_sensor == 1)
-        {
-            fanState = FAN_FAULTED;
-        }
-        else if (adc_raw_ntc1 >= OVER_TEMP_THRESH && adc_raw_ntc2 >= OVER_TEMP_THRESH)
-        {
-            fanState = FAN_FAULTED;
-        }
-        if (adc_raw_ntc1 < TEMP_HYST_THRESH && adc_raw_ntc2 < TEMP_HYST_THRESH)
-        {
-            fanState = FAN_START;
-        }
-        break;
-
-    case FAN_FAULTED:
-        target_fan_duty = 0;
-        // TO DO: Limit fan output current to 2 A and send fan failure message over CAN
-        break;
     }
-
-    if (target_fan_duty > fan_duty)
-    {
-        fan_duty += 5;
-    }
-    else if (target_fan_duty < fan_duty)
-    {
-        fan_duty -= 5;
-    }
-
-    //
-    // Acknowledge this interrupt to receive more interrupts from group 1
-    //
-    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
-}
-
-//
-// cpuTimer0ISR - Counter for CpuTimer0
-//
-__interrupt void fanreadISR(void)
-{
-    uint8_t tach_read = GPIO_readPin(TACH_in);
-    if (tach_count > 2500)
-    {
-        tach_count = 0;
-        fan_started = 0;
-    }
-    else if (tach_read != prev_tach_read)
-    {
-        if (tach_count > 10) {fan_started = 1;}
-        tach_count = 0;
-    }
-
-    tach_count++;
-    prev_tach_read = tach_read;
-
+    
     //
     // Acknowledge this interrupt to receive more interrupts from group 1
     //
@@ -355,23 +276,20 @@ __interrupt void fanreadISR(void)
 //
 // cpuTimer1ISR - Counter for CpuTimer1
 //
-__interrupt void fanreadISR(void)
+__interrupt void canSendISR(void)
 {
-    uint8_t tach_read = GPIO_readPin(TACH_in);
-    if (tach_count > 2500)
-    {
-        tach_count = 0;
-        fan_started = 0;
+    if (transmitReady == 1) {
+        //
+        // Transmit the message.
+        //
+        uint16_t txMsgData[4];
+        txMsgData[0] = (adc_raw_vdc1 >> 8) & 0x0F;
+        txMsgData[1] = adc_raw_vdc1 & 0xFF;
+        txMsgData[2] = (adc_raw_vdc2 >> 8) & 0x0F;
+        txMsgData[3] = adc_raw_vdc2 & 0xFF;
+        CAN_sendMessage(CANA_BASE, 1, 4, txMsgData);
+        transmitReady = 0;
     }
-    else if (tach_read != prev_tach_read)
-    {
-        if (tach_count > 10) {fan_started = 1;}
-        tach_count = 0;
-    }
-
-    tach_count++;
-    prev_tach_read = tach_read;
-
     //
     // Acknowledge this interrupt to receive more interrupts from group 1
     //
@@ -393,6 +311,8 @@ __interrupt void adcA1ISR(void)
     adc_raw_vac1 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER11);  // G1_VLT
     adc_raw_vac2 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER15);  // G2_VLT
 
+    adcDataReady = true;
+
     //
     // Clear the interrupt flag
     //
@@ -401,7 +321,7 @@ __interrupt void adcA1ISR(void)
     //
     // Check if overflow has occurred
     //
-    if(true == ADC_getInterruptOverflowStatus(ADCA_BASE, ADC_INT_NUMBER1))
+    if(ADC_getInterruptOverflowStatus(ADCA_BASE, ADC_INT_NUMBER1))
     {
         ADC_clearInterruptOverflowStatus(ADCA_BASE, ADC_INT_NUMBER1);
         ADC_clearInterruptStatus(ADCA_BASE, ADC_INT_NUMBER1);
@@ -416,13 +336,14 @@ __interrupt void adcA1ISR(void)
 __interrupt void gbl_flt_ISR(void)
 {
     // Write code to handle fault - STOP ALL GATE signaling
-    GPIO_writePin(ENA_out, LOW);
-    GPIO_writePin(ENB_out, LOW);
+    GPIO_writePin(ENA_out, 0);
+    GPIO_writePin(ENB_out, 0);
 
     // Acknowledge the interrupt
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
 }
 
+// TBD: this might change to NOT of this as devices should not switch unless something has enabled them (as they are HIGH by default)
 __interrupt void gbl_enbl_ISR(void)
 {
     uint32_t enable_val;
@@ -430,6 +351,8 @@ __interrupt void gbl_enbl_ISR(void)
 
     GPIO_writePin(ENA_out, enable_val);
     GPIO_writePin(ENB_out, enable_val);
+
+    faultPresent = true;
 
     // Acknowledge the interrupt
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
@@ -441,6 +364,7 @@ __interrupt void gbl_enbl_ISR(void)
 __interrupt void epwm2ISR(void)
 {
     // Controller code to update PWM
+    updateCompare(&epwm2Info);
 
     // Clear INT flag for this timer
     EPWM_clearEventTriggerInterruptFlag(myEPWM3_BASE);
@@ -455,23 +379,10 @@ __interrupt void epwm2ISR(void)
 __interrupt void epwm3ISR(void)
 {
     // Controller code to update PWM
+    updateCompare(&epwm3Info);
 
     // Clear INT flag for this timer
     EPWM_clearEventTriggerInterruptFlag(myEPWM4_BASE);
-
-    // Acknowledge interrupt group
-    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP3);
-}
-
-//
-// fanISR - ePWM 5 ISR
-//
-__interrupt void fanISR(void)
-{
-    EPWM_setCounterCompareValue(fanPWM_BASE, EPWM_COUNTER_COMPARE_A, fan_duty);
-
-    // Clear INT flag for this timer
-    EPWM_clearEventTriggerInterruptFlag(fanPWM_BASE);
 
     // Acknowledge interrupt group
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP3);
@@ -487,6 +398,9 @@ __interrupt void myCAN0_0_ISR(void)
     if(status == CAN_INT_INT0ID_STATUS)
     {
         status = CAN_getStatus(CANA_BASE);
+
+        uint32_t rxCount, txCount;
+        bool isCANError = CAN_getErrorCount(CANA_BASE, &rxCount, &txCount);
 
         if(((status  & ~(CAN_STATUS_RXOK)) != CAN_STATUS_LEC_MSK) &&
                    ((status  & ~(CAN_STATUS_RXOK)) != CAN_STATUS_LEC_NONE))
@@ -505,7 +419,7 @@ __interrupt void myCAN0_0_ISR(void)
 
         errorFlag = 0;
 
-        txMsgSuccessful  = 0;
+        transmitReady = 1;
     }
     else if(status == 2)
     {

@@ -52,6 +52,7 @@ void initEPWM2(void);   // SIG A
 void initEPWM3(void);   // SIG B
 
 volatile uint8_t overTempThreshold = 0;
+volatile bool fanTachPresent = false;
 volatile uint8_t errorFlag = 0;
 volatile uint8_t adcDataReady = 0;
 volatile uint8_t transmitReady = 1;
@@ -111,11 +112,11 @@ void main(void)
 
     // IDLE loop
     for(;;) {
-        if(errorFlag) {
-            GPIO_writePin(ENA_out, 0);
-            GPIO_writePin(ENB_out, 0);
-            asm("   ESTOP0");
-        }
+        // if(errorFlag) {
+        //     GPIO_writePin(ENA_out, 0);
+        //     GPIO_writePin(ENB_out, 0);
+        //     asm("   ESTOP0");
+        // }
 
 
         if(adcDataReady) {
@@ -188,44 +189,57 @@ __interrupt void fanctrlISR(void)
     // Low priority reads for fan control - could be moved to slower timer
     adc_raw_ntc1 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER0);   // NTC1
     adc_raw_ntc2 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER1);   // NTC2
-    adc_raw_fans = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER5);   // FAN_SENS
 
-    if (adc_raw_ntc1 >= OVER_TEMP_THRESH && adc_raw_ntc2 >= OVER_TEMP_THRESH && overTempThreshold == 0)
-    {
-        overTempThreshold = 1;
-        GPIO_writePin(FAN_ctrl_out, 0); // turn on fan
-    }
-    else if (overTempThreshold == 1)
-    {
-        if (adc_raw_ntc1 >= TEMP_HYST_THRESH && adc_raw_ntc2 >= TEMP_HYST_THRESH)
+    if (fanTachPresent == false) {
+        if (adc_raw_ntc1 >= OVER_TEMP_THRESH && adc_raw_ntc2 >= OVER_TEMP_THRESH)
         {
-            if (adc_raw_fans < FAN_ON_OFF_THRESH)
+            overTempThreshold = 1;
+            GPIO_writePin(FAN_ctrl_out, 0); // turn on fan
+        } else if (overTempThreshold == 1) {
+            if (adc_raw_ntc1 < TEMP_HYST_THRESH && adc_raw_ntc2 < TEMP_HYST_THRESH)
+            {
+                overTempThreshold = 0;
+                GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
+            }
+        }
+    } else {
+        adc_raw_fans = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER5);   // FAN_SENS
+
+        if (adc_raw_ntc1 >= OVER_TEMP_THRESH && adc_raw_ntc2 >= OVER_TEMP_THRESH && overTempThreshold == 0)
+        {
+            overTempThreshold = 1;
+            GPIO_writePin(FAN_ctrl_out, 0); // turn on fan
+        }
+        else if (overTempThreshold == 1)
+        {
+            if (adc_raw_ntc1 >= TEMP_HYST_THRESH && adc_raw_ntc2 >= TEMP_HYST_THRESH)
+            {
+                if (adc_raw_fans < FAN_ON_OFF_THRESH)
+                {
+                    GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
+                    GPIO_writePin(ENA_out, 0);
+                    GPIO_writePin(ENB_out, 0);
+                    // TO DO: Write (CAN TX) fan fault message high
+                }
+                // Leave fan on
+            }
+            else
+            {
+                overTempThreshold = 0;
+                GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
+            }
+        }
+        else
+        {
+            if (adc_raw_fans >= FAN_ON_OFF_THRESH)
             {
                 GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
                 GPIO_writePin(ENA_out, 0);
                 GPIO_writePin(ENB_out, 0);
-                // TO DO: Write (CAN TX) fan fault message high
+                // TO DO: Write (CAN TX) fan fault message high when was meant to be low
             }
-            // Leave fan on
-        }
-        else
-        {
-            overTempThreshold = 0;
-            GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
         }
     }
-    else
-    {
-        if (adc_raw_fans >= FAN_ON_OFF_THRESH)
-        {
-            GPIO_writePin(FAN_ctrl_out, 1); // turn off fan
-            GPIO_writePin(ENA_out, 0);
-            GPIO_writePin(ENB_out, 0);
-            // TO DO: Write (CAN TX) fan fault message high when was meant to be low
-        }
-    }
-
-//    GPIO_togglePin(FAN_ctrl_out);
 
     //
     // Acknowledge this interrupt to receive more interrupts from group 1

@@ -102,16 +102,6 @@ extern "C"
 #define GPIO_PIN_EPWM3_B 5
 #define myEPWM3_EPWMB_GPIO 5
 #define myEPWM3_EPWMB_PIN_CONFIG GPIO_5_EPWM3_B
-
-//
-// EPWM5 -> fanPWM Pinmux
-//
-//
-// EPWM5_A - GPIO Settings
-//
-#define GPIO_PIN_EPWM5_A 16
-#define fanPWM_EPWMA_GPIO 16
-#define fanPWM_EPWMA_PIN_CONFIG GPIO_16_EPWM5_A
 //
 // GPIO0 - GPIO Settings
 //
@@ -144,6 +134,10 @@ extern "C"
 // GPIO33 - GPIO Settings
 //
 #define EN_in_GPIO_PIN_CONFIG GPIO_33_GPIO33
+//
+// GPIO16 - GPIO Settings
+//
+#define FAN_ctrl_out_GPIO_PIN_CONFIG GPIO_16_GPIO16
 
 //*****************************************************************************
 //
@@ -262,19 +256,6 @@ void myCPUTIMER1_init();
 #define myEPWM3_TZA_ACTION EPWM_TZ_ACTION_HIGH_Z
 #define myEPWM3_TZB_ACTION EPWM_TZ_ACTION_HIGH_Z
 #define myEPWM3_INTERRUPT_SOURCE EPWM_INT_TBCTR_ZERO
-#define fanPWM_BASE EPWM5_BASE
-#define fanPWM_TBPRD 2000
-#define fanPWM_COUNTER_MODE EPWM_COUNTER_MODE_UP
-#define fanPWM_TBPHS 0
-#define fanPWM_CMPA 1000
-#define fanPWM_CMPB 0
-#define fanPWM_CMPC 0
-#define fanPWM_CMPD 0
-#define fanPWM_DBRED 0
-#define fanPWM_DBFED 0
-#define fanPWM_TZA_ACTION EPWM_TZ_ACTION_HIGH_Z
-#define fanPWM_TZB_ACTION EPWM_TZ_ACTION_HIGH_Z
-#define fanPWM_INTERRUPT_SOURCE EPWM_INT_TBCTR_ZERO
 
 //*****************************************************************************
 //
@@ -297,6 +278,8 @@ void RDY_out_init();
 void ENA_out_init();
 #define EN_in 33
 void EN_in_init();
+#define FAN_ctrl_out 16
+void FAN_ctrl_out_init();
 
 //*****************************************************************************
 //
@@ -317,35 +300,42 @@ void myINPUTXBARINPUT1_init();
 //*****************************************************************************
 
 // Interrupt Settings for INT_myADC0_1
+// ISR need to be defined for the registered interrupts
 #define INT_myADC0_1 INT_ADCA1
 #define INT_myADC0_1_INTERRUPT_ACK_GROUP INTERRUPT_ACK_GROUP1
 extern __interrupt void adcA1ISR(void);
 
 // Interrupt Settings for INT_myCAN0_0
+// ISR need to be defined for the registered interrupts
 #define INT_myCAN0_0 INT_CANA0
 #define INT_myCAN0_0_INTERRUPT_ACK_GROUP INTERRUPT_ACK_GROUP9
 extern __interrupt void myCAN0_0_ISR(void);
 
 // Interrupt Settings for INT_myCAN0_1
+// ISR need to be defined for the registered interrupts
 #define INT_myCAN0_1 INT_CANA1
 #define INT_myCAN0_1_INTERRUPT_ACK_GROUP INTERRUPT_ACK_GROUP9
 extern __interrupt void myCAN0_1_ISR(void);
 
 // Interrupt Settings for INT_myCPUTIMER0
+// ISR need to be defined for the registered interrupts
 #define INT_myCPUTIMER0 INT_TIMER0
 #define INT_myCPUTIMER0_INTERRUPT_ACK_GROUP INTERRUPT_ACK_GROUP1
 extern __interrupt void fanctrlISR(void);
 
 // Interrupt Settings for INT_myCPUTIMER1
+// ISR need to be defined for the registered interrupts
 #define INT_myCPUTIMER1 INT_TIMER1
-extern __interrupt void fanreadISR(void);
+extern __interrupt void canSendISR(void);
 
 // Interrupt Settings for INT_FLTN_in_XINT
+// ISR need to be defined for the registered interrupts
 #define INT_FLTN_in_XINT INT_XINT1
 #define INT_FLTN_in_XINT_INTERRUPT_ACK_GROUP INTERRUPT_ACK_GROUP1
 extern __interrupt void gbl_flt_ISR(void);
 
 // Interrupt Settings for INT_EN_in_XINT
+// ISR need to be defined for the registered interrupts
 #define INT_EN_in_XINT INT_XINT2
 #define INT_EN_in_XINT_INTERRUPT_ACK_GROUP INTERRUPT_ACK_GROUP1
 extern __interrupt void gbl_enbl_ISR(void);
