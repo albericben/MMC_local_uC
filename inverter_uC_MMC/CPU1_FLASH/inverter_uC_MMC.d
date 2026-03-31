@@ -1,7 +1,7 @@
 # FIXED
 
 inverter_uC_MMC.obj: ../inverter_uC_MMC.c
-inverter_uC_MMC.obj: C:/Users/alber/workspace_ccstheia/inverter_uC_MMC/device/driverlib.h
+inverter_uC_MMC.obj: C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/device/driverlib.h
 inverter_uC_MMC.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/inc/hw_memmap.h
 inverter_uC_MMC.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/adc.h
 inverter_uC_MMC.obj: C:/ti/ccs2020/ccs/tools/compiler/ti-cgt-c2000_22.6.2.LTS/include/stdbool.h
@@ -87,13 +87,13 @@ inverter_uC_MMC.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/spi.
 inverter_uC_MMC.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/inc/hw_spi.h
 inverter_uC_MMC.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/version.h
 inverter_uC_MMC.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/driver_inclusive_terminology_mapping.h
-inverter_uC_MMC.obj: C:/Users/alber/workspace_ccstheia/inverter_uC_MMC/device/device.h
+inverter_uC_MMC.obj: C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/device/device.h
 inverter_uC_MMC.obj: C:/ti/ccs2020/ccs/tools/compiler/ti-cgt-c2000_22.6.2.LTS/include/stddef.h
 inverter_uC_MMC.obj: syscfg/board.h
 
 ../inverter_uC_MMC.c:
 
-C:/Users/alber/workspace_ccstheia/inverter_uC_MMC/device/driverlib.h:
+C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/device/driverlib.h:
 
 C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/inc/hw_memmap.h:
 
@@ -265,7 +265,7 @@ C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/version.h:
 
 C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/driver_inclusive_terminology_mapping.h:
 
-C:/Users/alber/workspace_ccstheia/inverter_uC_MMC/device/device.h:
+C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/device/device.h:
 
 C:/ti/ccs2020/ccs/tools/compiler/ti-cgt-c2000_22.6.2.LTS/include/stddef.h:
 

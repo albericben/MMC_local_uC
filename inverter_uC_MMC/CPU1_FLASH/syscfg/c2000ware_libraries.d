@@ -3,7 +3,7 @@
 syscfg/c2000ware_libraries.obj: syscfg/c2000ware_libraries.c
 syscfg/c2000ware_libraries.obj: syscfg/c2000ware_libraries.h
 syscfg/c2000ware_libraries.obj: syscfg/board.h
-syscfg/c2000ware_libraries.obj: C:/Users/alber/workspace_ccstheia/inverter_uC_MMC/device/driverlib.h
+syscfg/c2000ware_libraries.obj: C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/device/driverlib.h
 syscfg/c2000ware_libraries.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/inc/hw_memmap.h
 syscfg/c2000ware_libraries.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/adc.h
 syscfg/c2000ware_libraries.obj: C:/ti/ccs2020/ccs/tools/compiler/ti-cgt-c2000_22.6.2.LTS/include/stdbool.h
@@ -89,7 +89,7 @@ syscfg/c2000ware_libraries.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/dri
 syscfg/c2000ware_libraries.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/inc/hw_spi.h
 syscfg/c2000ware_libraries.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/version.h
 syscfg/c2000ware_libraries.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/driver_inclusive_terminology_mapping.h
-syscfg/c2000ware_libraries.obj: C:/Users/alber/workspace_ccstheia/inverter_uC_MMC/device/device.h
+syscfg/c2000ware_libraries.obj: C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/device/device.h
 syscfg/c2000ware_libraries.obj: C:/ti/ccs2020/ccs/tools/compiler/ti-cgt-c2000_22.6.2.LTS/include/stddef.h
 
 syscfg/c2000ware_libraries.c:
@@ -98,7 +98,7 @@ syscfg/c2000ware_libraries.h:
 
 syscfg/board.h:
 
-C:/Users/alber/workspace_ccstheia/inverter_uC_MMC/device/driverlib.h:
+C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/device/driverlib.h:
 
 C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/inc/hw_memmap.h:
 
@@ -270,7 +270,7 @@ C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/version.h:
 
 C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/driver_inclusive_terminology_mapping.h:
 
-C:/Users/alber/workspace_ccstheia/inverter_uC_MMC/device/device.h:
+C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/device/device.h:
 
 C:/ti/ccs2020/ccs/tools/compiler/ti-cgt-c2000_22.6.2.LTS/include/stddef.h:
 

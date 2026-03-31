@@ -2,7 +2,7 @@
 
 syscfg/board.obj: syscfg/board.c
 syscfg/board.obj: syscfg/board.h
-syscfg/board.obj: C:/Users/alber/workspace_ccstheia/inverter_uC_MMC/device/driverlib.h
+syscfg/board.obj: C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/device/driverlib.h
 syscfg/board.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/inc/hw_memmap.h
 syscfg/board.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/adc.h
 syscfg/board.obj: C:/ti/ccs2020/ccs/tools/compiler/ti-cgt-c2000_22.6.2.LTS/include/stdbool.h
@@ -88,14 +88,14 @@ syscfg/board.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/spi.h
 syscfg/board.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/inc/hw_spi.h
 syscfg/board.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/version.h
 syscfg/board.obj: C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/driver_inclusive_terminology_mapping.h
-syscfg/board.obj: C:/Users/alber/workspace_ccstheia/inverter_uC_MMC/device/device.h
+syscfg/board.obj: C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/device/device.h
 syscfg/board.obj: C:/ti/ccs2020/ccs/tools/compiler/ti-cgt-c2000_22.6.2.LTS/include/stddef.h
 
 syscfg/board.c:
 
 syscfg/board.h:
 
-C:/Users/alber/workspace_ccstheia/inverter_uC_MMC/device/driverlib.h:
+C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/device/driverlib.h:
 
 C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/inc/hw_memmap.h:
 
@@ -267,7 +267,7 @@ C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/version.h:
 
 C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib/driver_inclusive_terminology_mapping.h:
 
-C:/Users/alber/workspace_ccstheia/inverter_uC_MMC/device/device.h:
+C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC/device/device.h:
 
 C:/ti/ccs2020/ccs/tools/compiler/ti-cgt-c2000_22.6.2.LTS/include/stddef.h:
 

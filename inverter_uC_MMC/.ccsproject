@@ -11,7 +11,6 @@
 	<rts value="libc.a"/>
 	<createSlaveProjects value=""/>
 	<templateProperties value="id=epwm_ex2_updown_aq.projectspec.epwm_ex2_updown_aq"/>
-	<origin value="C:/Users/alber/Documents/MMC_local_uC/inverter_uC_MMC"/>
 	<filesToOpen value=""/>
 	<isTargetManual value="true"/>
 	<activeTargetConfiguration value="targetConfigs/TMS320F280023C.ccxml"/>

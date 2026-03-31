@@ -12,7 +12,7 @@ SYSCFG_SRCS += \
 ../inverter_basic.syscfg 
 
 LIB_SRCS += \
-C:/ti/ccs2020/ccs/eclipse/COM_TI_C2000WARE_SOFTWARE_PACKAGE_INSTALL_DIR/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib 
+C:/ti/c2000/C2000Ware_5_05_00_00/driverlib/f28002x/driverlib/ccs/Debug/driverlib.lib 
 
 C_SRCS += \
 ../inverter_basic.c 

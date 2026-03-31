@@ -4,13 +4,13 @@
         <cconfiguration id="com.ti.ccstudio.buildDefinitions.C2000.Default.1222248188">
             <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.ti.ccstudio.buildDefinitions.C2000.Default.1222248188" moduleId="org.eclipse.cdt.core.settings" name="CPU1_RAM">
                 <macros>
-                    <stringMacro name="SYSTEMC_INSTALL" type="VALUE_PATH_ANY" value="C:/ti/C2000Ware_5_04_00_00/utilities/clb_tool/clb_syscfg/systemc-2.3.3"/>
-                    <stringMacro name="C2000WARE_DLIB_ROOT" type="VALUE_PATH_ANY" value="C:/ti/C2000Ware_5_04_00_00/driverlib/f28002x/driverlib"/>
-                    <stringMacro name="C2000WARE_ROOT" type="VALUE_PATH_ANY" value="C:/ti/C2000Ware_5_04_00_00"/>
+                    <stringMacro name="SYSTEMC_INSTALL" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/utilities/clb_tool/clb_syscfg/systemc-2.3.3"/>
+                    <stringMacro name="C2000WARE_DLIB_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/driverlib/f28002x/driverlib"/>
+                    <stringMacro name="C2000WARE_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}"/>
                     <stringMacro name="GENERATE_DIAGRAM" type="VALUE_TEXT" value="0"/>
-                    <stringMacro name="CLB_SYSCFG_ROOT" type="VALUE_PATH_ANY" value="C:/ti/C2000Ware_5_04_00_00/utilities/clb_tool/clb_syscfg"/>
+                    <stringMacro name="CLB_SYSCFG_ROOT" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}/utilities/clb_tool/clb_syscfg"/>
                     <stringMacro name="CLB_SIM_COMPILER" type="VALUE_PATH_ANY" value="C:/TDM-GCC-64/bin"/>
-                    <stringMacro name="COM_TI_C2000WARE_SOFTWARE_PACKAGE_INSTALL_DIR" type="VALUE_PATH_ANY" value="C:\ti\C2000Ware_5_04_00_00"/>
+                    <stringMacro name="COM_TI_C2000WARE_SOFTWARE_PACKAGE_INSTALL_DIR" type="VALUE_PATH_ANY" value="${COM_TI_C2000WARE_INSTALL_DIR}"/>
                 </macros>
                 <externalSettings/>
                 <extensions>
